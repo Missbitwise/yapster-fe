@@ -43,7 +43,7 @@ const WebSocketContext = createContext<WebSocketContextType | undefined>(
 );
 
 const WS_BASE_URL =
-  process.env.NEXT_PUBLIC_WS_URL || "ws://localhost:8080";
+  process.env.NEXT_PUBLIC_WS_URL || "wss://yapster-be.onrender.com";
 
 export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
