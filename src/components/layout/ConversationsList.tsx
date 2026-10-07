@@ -198,8 +198,6 @@ export const ConversationsList: React.FC<ConversationsListProps> = ({
                           <span className="text-brand-light font-medium animate-pulse">
                             typing...
                           </span>
-                        ) : friend.bio ? (
-                          friend.bio
                         ) : (
                           `@${friend.username}`
                         )}
