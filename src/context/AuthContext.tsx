@@ -54,10 +54,26 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       }
 
       setToken(storedToken);
+      let localUser: Partial<User> | null = null;
+      try {
+        const raw = localStorage.getItem("yapster_user");
+        if (raw) localUser = JSON.parse(raw);
+      } catch {}
+
+      if (localUser && localUser.id) {
+        setUser(localUser as User);
+      }
+
       const res = await authService.getMe();
       if (res.success && res.data) {
-        setUser(res.data);
-        localStorage.setItem("yapster_user", JSON.stringify(res.data));
+        const mergedUser = {
+          ...res.data,
+          ...(localUser || {}),
+          id: res.data.id,
+          created_at: res.data.created_at || localUser?.created_at,
+        };
+        setUser(mergedUser);
+        localStorage.setItem("yapster_user", JSON.stringify(mergedUser));
       } else {
         logout();
       }
@@ -127,7 +143,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   };
 
   const updateUserLocally = (updater: Partial<User>) => {
-    setUser((prev) => (prev ? { ...prev, ...updater } : null));
+    setUser((prev) => {
+      if (!prev) return null;
+      const updated = { ...prev, ...updater };
+      if (typeof window !== "undefined") {
+        localStorage.setItem("yapster_user", JSON.stringify(updated));
+      }
+      return updated;
+    });
   };
 
   const isAuthenticated = !!token && !!user;
