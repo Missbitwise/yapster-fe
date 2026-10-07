@@ -49,6 +49,10 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({
 
   const formattedTime = formatMessageTime(message.createdAt);
 
+  const isMedia =
+    /^https?:\/\/.+\.(gif|webp|png|jpe?g)(\?.*)?$/i.test(message.content.trim()) ||
+    /^https?:\/\/media\.giphy\.com\/media\/.+/i.test(message.content.trim());
+
   return (
     <div
       className={`group relative flex items-end gap-2.5 my-2.5 px-4 ${
@@ -74,9 +78,20 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({
         }`}
       >
         {/* Message Content */}
-        <p className="text-sm leading-relaxed whitespace-pre-wrap break-words">
-          {message.content}
-        </p>
+        {isMedia ? (
+          <div className="my-1 overflow-hidden rounded-xl bg-black/20">
+            <img
+              src={message.content.trim()}
+              alt="GIF"
+              className="max-h-64 max-w-full rounded-xl object-contain"
+              loading="lazy"
+            />
+          </div>
+        ) : (
+          <p className="text-sm leading-relaxed whitespace-pre-wrap break-words">
+            {message.content}
+          </p>
+        )}
 
         {/* Footer info: time, edited tag, status ticks */}
         <div
