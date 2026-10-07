@@ -10,6 +10,7 @@ import { FriendsTab } from "@/components/friends/FriendsTab";
 import { FriendRequestsModal } from "@/components/friends/FriendRequestsModal";
 import { BlockedUsersModal } from "@/components/friends/BlockedUsersModal";
 import { UserProfileModal } from "@/components/layout/UserProfileModal";
+import { ContactProfileModal } from "@/components/friends/ContactProfileModal";
 import { LocationPromptModal } from "@/components/location/LocationPromptModal";
 import { useFriends } from "@/hooks/useFriends";
 import { useNearby } from "@/hooks/useNearby";
@@ -38,12 +39,13 @@ export default function ChatDashboardPage() {
     updateLocation,
   } = useNearby(10);
 
-  const { subscribe } = useWebSocket();
+  const { subscribe, presenceMap } = useWebSocket();
   const { showToast } = useToast();
 
   const [currentTab, setCurrentTab] = useState<NavTab>("chats");
   const [activeContact, setActiveContact] = useState<Friend | null>(null);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const [contactProfileToView, setContactProfileToView] = useState<Friend | null>(null);
   const [isRequestsModalOpen, setIsRequestsModalOpen] = useState(false);
   const [isBlockedModalOpen, setIsBlockedModalOpen] = useState(false);
   const [isLocationModalOpen, setIsLocationModalOpen] = useState(false);
@@ -204,7 +206,7 @@ export default function ChatDashboardPage() {
                     isBlocked={isBlocked(activeContact.id)}
                     onBlockToggle={handleBlockToggle}
                     onBackMobile={() => setActiveContact(null)}
-                    onViewProfile={() => setIsProfileOpen(true)}
+                    onViewProfile={() => setContactProfileToView(activeContact)}
                   />
                 </div>
               ) : (
@@ -288,6 +290,27 @@ export default function ChatDashboardPage() {
         <UserProfileModal
           isOpen={isProfileOpen}
           onClose={() => setIsProfileOpen(false)}
+        />
+
+        <ContactProfileModal
+          isOpen={!!contactProfileToView}
+          onClose={() => setContactProfileToView(null)}
+          contact={contactProfileToView}
+          isOnline={
+            contactProfileToView
+              ? presenceMap[contactProfileToView.id]?.status === "online"
+              : false
+          }
+          lastSeen={
+            contactProfileToView
+              ? (presenceMap[contactProfileToView.id]?.lastSeen ??
+                contactProfileToView.last_seen)
+              : null
+          }
+          isBlocked={
+            contactProfileToView ? isBlocked(contactProfileToView.id) : false
+          }
+          onBlockToggle={handleBlockToggle}
         />
       </div>
     </ProtectedRoute>
