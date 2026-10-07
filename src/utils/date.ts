@@ -1,15 +1,10 @@
 const TIMEZONE_IST = "Asia/Kolkata";
 
 const getISTDateKey = (d: Date): string => {
-  // Returns "YYYY-MM-DD" in Asia/Kolkata
   return d.toLocaleDateString("en-CA", { timeZone: TIMEZONE_IST });
 };
 
-/**
- * Formats a last-seen ISO timestamp into a WhatsApp-style string in Indian Standard Time (IST).
- * Examples: "Last seen today at 10:41 AM", "Last seen yesterday at 2:30 PM",
- * "Last seen Oct 3 at 11:00 AM", or "Offline".
- */
+
 export const formatLastSeen = (timestamp?: string | null): string => {
   if (!timestamp) return "Offline";
   try {
@@ -50,10 +45,7 @@ export const formatLastSeen = (timestamp?: string | null): string => {
   }
 };
 
-/**
- * Compact format for sidebar list items in Indian Standard Time (IST).
- * Examples: "10:41 AM", "Yesterday", "Oct 3", or "Offline".
- */
+
 export const formatLastSeenCompact = (timestamp?: string | null): string => {
   if (!timestamp) return "Offline";
   try {
@@ -90,10 +82,7 @@ export const formatLastSeenCompact = (timestamp?: string | null): string => {
   }
 };
 
-/**
- * Formats message timestamp in Indian Standard Time (IST).
- * Example: "10:41 AM"
- */
+
 export const formatMessageTime = (timestamp: string | Date): string => {
   try {
     const date = typeof timestamp === "string" ? new Date(timestamp) : timestamp;
@@ -107,5 +96,42 @@ export const formatMessageTime = (timestamp: string | Date): string => {
     });
   } catch {
     return "";
+  }
+};
+
+
+export const formatJoinDate = (timestamp?: string | null): string => {
+  if (!timestamp) {
+    const now = new Date();
+    return now.toLocaleDateString("en-IN", {
+      timeZone: TIMEZONE_IST,
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+    });
+  }
+  try {
+    const date = new Date(timestamp);
+    if (isNaN(date.getTime())) {
+      return new Date().toLocaleDateString("en-IN", {
+        timeZone: TIMEZONE_IST,
+        day: "numeric",
+        month: "long",
+        year: "numeric",
+      });
+    }
+    return date.toLocaleDateString("en-IN", {
+      timeZone: TIMEZONE_IST,
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+    });
+  } catch {
+    return new Date().toLocaleDateString("en-IN", {
+      timeZone: TIMEZONE_IST,
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+    });
   }
 };
