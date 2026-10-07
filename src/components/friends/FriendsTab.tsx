@@ -121,12 +121,6 @@ export const FriendsTab: React.FC<FriendsTabProps> = ({
                       </span>
                     </div>
                   </div>
-
-                  {friend.bio && (
-                    <p className="text-xs text-slate-300 line-clamp-2 italic mb-2">
-                      &quot;{friend.bio}&quot;
-                    </p>
-                  )}
                 </div>
 
                 <div className="flex items-center gap-2 mt-3 pt-3 border-t border-card-border/60">
