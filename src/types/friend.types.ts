@@ -6,6 +6,7 @@ export interface Friend {
   bio?: string | null;
   last_seen?: string | null;
   friends_since: string;
+  created_at?: string;
 }
 
 export interface FriendRequest {
