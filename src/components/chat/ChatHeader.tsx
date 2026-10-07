@@ -3,8 +3,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import { Avatar } from "@/components/ui/Avatar";
 import {
-  Phone,
-  Video,
   MoreVertical,
   ArrowLeft,
   ShieldAlert,
@@ -111,24 +109,8 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({
         </div>
       </div>
 
-      {/* Action Icons matching reference mockup */}
+      {/* Header Actions */}
       <div className="flex items-center gap-1 sm:gap-2 text-slate-400">
-        <button
-          onClick={() => alert("Voice call initiated (demo)")}
-          className="p-2 hover:text-brand-light hover:bg-surface-100 rounded-full transition-colors"
-          title="Start voice call"
-        >
-          <Phone className="w-5 h-5" />
-        </button>
-
-        <button
-          onClick={() => alert("Video call initiated (demo)")}
-          className="p-2 hover:text-brand-light hover:bg-surface-100 rounded-full transition-colors"
-          title="Start video call"
-        >
-          <Video className="w-5 h-5" />
-        </button>
-
         {/* Options Menu */}
         <div className="relative" ref={menuRef}>
           <button
