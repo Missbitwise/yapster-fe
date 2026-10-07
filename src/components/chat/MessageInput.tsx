@@ -1,7 +1,8 @@
 "use client";
 
 import React, { useState, useRef, useEffect, useCallback } from "react";
-import { Send, Paperclip, Smile } from "lucide-react";
+import { Send, Smile } from "lucide-react";
+import { EmojiGifPicker } from "./EmojiGifPicker";
 
 interface MessageInputProps {
   onSendMessage: (content: string) => void;
@@ -19,6 +20,7 @@ export const MessageInput: React.FC<MessageInputProps> = ({
   disabledPlaceholder,
 }) => {
   const [content, setContent] = useState("");
+  const [isPickerOpen, setIsPickerOpen] = useState(false);
   const typingTimerRef = useRef<NodeJS.Timeout | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -45,6 +47,7 @@ export const MessageInput: React.FC<MessageInputProps> = ({
 
     onSendMessage(content.trim());
     setContent("");
+    setIsPickerOpen(false);
     if (inputRef.current) {
       inputRef.current.focus();
     }
@@ -57,6 +60,30 @@ export const MessageInput: React.FC<MessageInputProps> = ({
     }
   };
 
+  const handleSelectEmoji = (emoji: string) => {
+    if (inputRef.current) {
+      const start = inputRef.current.selectionStart ?? content.length;
+      const end = inputRef.current.selectionEnd ?? content.length;
+      const newContent = content.substring(0, start) + emoji + content.substring(end);
+      setContent(newContent);
+      handleTypingEvent();
+      setTimeout(() => {
+        if (inputRef.current) {
+          inputRef.current.focus();
+          const newPos = start + emoji.length;
+          inputRef.current.setSelectionRange(newPos, newPos);
+        }
+      }, 0);
+    } else {
+      setContent((prev) => prev + emoji);
+    }
+  };
+
+  const handleSelectGif = (gifUrl: string) => {
+    setIsPickerOpen(false);
+    onSendMessage(gifUrl);
+  };
+
   useEffect(() => {
     return () => {
       if (typingTimerRef.current) {
@@ -66,19 +93,32 @@ export const MessageInput: React.FC<MessageInputProps> = ({
   }, []);
 
   return (
-    <div className="p-3 sm:p-4 bg-surface-200/90 border-t border-card-border/60 backdrop-blur-md">
+    <div className="relative p-3 sm:p-4 bg-surface-200/90 border-t border-card-border/60 backdrop-blur-md">
+      {/* Emoji & GIF Popover Picker */}
+      <EmojiGifPicker
+        isOpen={isPickerOpen}
+        onClose={() => setIsPickerOpen(false)}
+        onSelectEmoji={handleSelectEmoji}
+        onSelectGif={handleSelectGif}
+      />
+
       <form
         onSubmit={handleSubmit}
         className="flex items-center gap-2.5 bg-surface-100 border border-card-border/80 rounded-full px-3.5 py-1.5 shadow-inner transition-colors focus-within:border-brand/70"
       >
-        {/* Attachment Mock Icon */}
+        {/* Emoji & GIF Toggle Button */}
         <button
           type="button"
           disabled={disabled}
-          title="Attach file (mock)"
-          className="p-2 text-slate-400 hover:text-brand-light rounded-full transition-colors disabled:opacity-40"
+          onClick={() => setIsPickerOpen((prev) => !prev)}
+          title="Emojis & GIFs"
+          className={`p-2 rounded-full transition-colors ${
+            isPickerOpen
+              ? "text-brand-light bg-brand/20 shadow-glow-sm"
+              : "text-slate-400 hover:text-brand-light hover:bg-surface-50"
+          } disabled:opacity-40`}
         >
-          <Paperclip className="w-5 h-5 -rotate-45" />
+          <Smile className="w-5 h-5" />
         </button>
 
         {/* Text Input */}
