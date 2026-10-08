@@ -11,7 +11,8 @@ export interface Friend {
 
 export interface FriendRequest {
   id: string;
-  sender_id: string;
+  sender_id?: string;
+  receiver_id?: string;
   name: string;
   username: string;
   profile_picture?: string | null;

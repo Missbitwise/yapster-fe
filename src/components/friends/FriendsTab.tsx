@@ -6,6 +6,7 @@ import { Avatar } from "@/components/ui/Avatar";
 import { useWebSocket } from "@/context/WebSocketContext";
 import { Search, MessageCircle, ShieldAlert, Users, Compass } from "lucide-react";
 import { formatLastSeen } from "@/utils/date";
+import { BlockUserModal } from "./BlockUserModal";
 
 interface FriendsTabProps {
   friends: Friend[];
@@ -21,6 +22,7 @@ export const FriendsTab: React.FC<FriendsTabProps> = ({
   onExploreNearby,
 }) => {
   const [search, setSearch] = useState("");
+  const [userToBlock, setUserToBlock] = useState<Friend | null>(null);
   const { presenceMap } = useWebSocket();
 
   const filtered = useMemo(() => {
@@ -133,11 +135,7 @@ export const FriendsTab: React.FC<FriendsTabProps> = ({
                   </button>
 
                   <button
-                    onClick={() => {
-                      if (confirm(`Block ${friend.name}?`)) {
-                        onBlockUser(friend.id);
-                      }
-                    }}
+                    onClick={() => setUserToBlock(friend)}
                     className="p-2 rounded-xl text-slate-500 hover:text-rose-400 hover:bg-rose-500/10 transition-colors"
                     title="Block friend"
                   >
@@ -149,6 +147,16 @@ export const FriendsTab: React.FC<FriendsTabProps> = ({
           })}
         </div>
       )}
+
+      {/* Block Confirmation Modal */}
+      <BlockUserModal
+        isOpen={!!userToBlock}
+        onClose={() => setUserToBlock(null)}
+        user={userToBlock}
+        onConfirmBlock={async (userId) => {
+          await onBlockUser(userId);
+        }}
+      />
     </div>
   );
 };

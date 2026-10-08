@@ -11,6 +11,7 @@ import { FriendRequestsModal } from "@/components/friends/FriendRequestsModal";
 import { BlockedUsersModal } from "@/components/friends/BlockedUsersModal";
 import { UserProfileModal } from "@/components/layout/UserProfileModal";
 import { ContactProfileModal } from "@/components/friends/ContactProfileModal";
+import { BlockUserModal } from "@/components/friends/BlockUserModal";
 import { LocationPromptModal } from "@/components/location/LocationPromptModal";
 import { useFriends } from "@/hooks/useFriends";
 import { useNearby } from "@/hooks/useNearby";
@@ -25,9 +26,11 @@ export default function ChatDashboardPage() {
   const {
     friends,
     requests,
+    sentRequests,
     blockedUsers,
     respondRequest,
     sendRequest,
+    cancelRequest,
     blockUser,
     unblockUser,
     isBlocked,
@@ -49,6 +52,7 @@ export default function ChatDashboardPage() {
   const [isRequestsModalOpen, setIsRequestsModalOpen] = useState(false);
   const [isBlockedModalOpen, setIsBlockedModalOpen] = useState(false);
   const [isLocationModalOpen, setIsLocationModalOpen] = useState(false);
+  const [userToBlock, setUserToBlock] = useState<{ id: string; name: string } | null>(null);
 
   // Check if location prompt should appear automatically on first entry
   useEffect(() => {
@@ -131,14 +135,7 @@ export default function ChatDashboardPage() {
         type: "success",
       });
     } else {
-      if (confirm(`Are you sure you want to block ${activeContact.name}?`)) {
-        await blockUser(contactId);
-        showToast({
-          title: "User Blocked",
-          description: `Blocked ${activeContact.name}`,
-          type: "info",
-        });
-      }
+      setUserToBlock({ id: activeContact.id, name: activeContact.name });
     }
   };
 
@@ -189,6 +186,7 @@ export default function ChatDashboardPage() {
                   activeContactId={activeContact?.id || null}
                   onSelectContact={(contact) => setActiveContact(contact)}
                   onOpenNearby={() => setCurrentTab("nearby")}
+                  isBlocked={isBlocked}
                 />
               </div>
             </div>
@@ -239,8 +237,10 @@ export default function ChatDashboardPage() {
           <div className="flex-1 h-full overflow-hidden">
             <NearbyRadar
               friends={friends}
+              sentRequests={sentRequests}
               onOpenChat={handleOpenChatWithContact}
               onSendFriendRequest={sendRequest}
+              onCancelFriendRequest={cancelRequest}
               onBlockUser={blockUser}
             />
           </div>
@@ -277,14 +277,30 @@ export default function ChatDashboardPage() {
           isOpen={isRequestsModalOpen}
           onClose={() => setIsRequestsModalOpen(false)}
           requests={requests}
+          sentRequests={sentRequests}
           onRespond={respondRequest}
+          onCancelRequest={async (requestId) => {
+            await cancelRequest(requestId);
+            showToast({
+              title: "Request Cancelled",
+              description: "Friend request has been cancelled",
+              type: "info",
+            });
+          }}
         />
 
         <BlockedUsersModal
           isOpen={isBlockedModalOpen}
           onClose={() => setIsBlockedModalOpen(false)}
           blockedUsers={blockedUsers}
-          onUnblock={unblockUser}
+          onUnblock={async (id) => {
+            await unblockUser(id);
+            showToast({
+              title: "User Unblocked",
+              description: "User is unblocked and back in your friends list",
+              type: "success",
+            });
+          }}
         />
 
         <UserProfileModal
@@ -310,7 +326,37 @@ export default function ChatDashboardPage() {
           isBlocked={
             contactProfileToView ? isBlocked(contactProfileToView.id) : false
           }
-          onBlockToggle={handleBlockToggle}
+          onBlockToggle={async () => {
+            if (!contactProfileToView) return;
+            const id = contactProfileToView.id;
+            if (isBlocked(id)) {
+              await unblockUser(id);
+              showToast({
+                title: "User Unblocked",
+                description: `Unblocked ${contactProfileToView.name}`,
+                type: "success",
+              });
+            } else {
+              setUserToBlock({
+                id: contactProfileToView.id,
+                name: contactProfileToView.name,
+              });
+            }
+          }}
+        />
+
+        <BlockUserModal
+          isOpen={!!userToBlock}
+          onClose={() => setUserToBlock(null)}
+          user={userToBlock}
+          onConfirmBlock={async (userId) => {
+            await blockUser(userId);
+            showToast({
+              title: "User Blocked",
+              description: `Blocked ${userToBlock?.name}`,
+              type: "info",
+            });
+          }}
         />
       </div>
     </ProtectedRoute>

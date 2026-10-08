@@ -13,6 +13,7 @@ interface ConversationsListProps {
   activeContactId: string | null;
   onSelectContact: (contact: Friend) => void;
   onOpenNearby?: () => void;
+  isBlocked?: (userId: string) => boolean;
 }
 
 export const ConversationsList: React.FC<ConversationsListProps> = ({
@@ -20,6 +21,7 @@ export const ConversationsList: React.FC<ConversationsListProps> = ({
   activeContactId,
   onSelectContact,
   onOpenNearby,
+  isBlocked,
 }) => {
   const [searchQuery, setSearchQuery] = useState("");
   const { presenceMap, typingMap, unreadTotal } = useWebSocket();
@@ -35,10 +37,12 @@ export const ConversationsList: React.FC<ConversationsListProps> = ({
     );
   }, [friends, searchQuery]);
 
-  // Identify currently active (online) friends for the top rail
+  // Identify currently active (online) friends for the top rail (exclude blocked)
   const activeFriends = useMemo(() => {
-    return friends.filter((f) => presenceMap[f.id]?.status === "online");
-  }, [friends, presenceMap]);
+    return friends.filter(
+      (f) => presenceMap[f.id]?.status === "online" && !isBlocked?.(f.id)
+    );
+  }, [friends, presenceMap, isBlocked]);
 
   const avatarRings: Array<"purple" | "yellow" | "cyan" | "pink"> = [
     "yellow",
@@ -160,6 +164,7 @@ export const ConversationsList: React.FC<ConversationsListProps> = ({
                     : friend.last_seen;
                 const isTyping = !!typingMap[friend.id];
                 const ring = avatarRings[idx % avatarRings.length];
+                const blocked = isBlocked?.(friend.id) || false;
 
                 return (
                   <button
@@ -175,7 +180,7 @@ export const ConversationsList: React.FC<ConversationsListProps> = ({
                       src={friend.profile_picture}
                       name={friend.name}
                       size="md"
-                      isOnline={isOnline}
+                      isOnline={blocked ? false : isOnline}
                       ringColor={ring}
                     />
 
@@ -185,7 +190,11 @@ export const ConversationsList: React.FC<ConversationsListProps> = ({
                           {friend.name}
                         </h3>
                         <span className="text-[10px] text-slate-400 shrink-0">
-                          {isOnline ? (
+                          {blocked ? (
+                            <span className="text-[10px] text-rose-400 font-semibold bg-rose-500/10 px-1.5 py-0.5 rounded border border-rose-500/20">
+                              Blocked
+                            </span>
+                          ) : isOnline ? (
                             <span className="text-emerald-400 font-medium">Online</span>
                           ) : (
                             formatLastSeenCompact(lastSeen)

@@ -9,6 +9,7 @@ export const useFriends = () => {
   const { isAuthenticated } = useAuth();
   const [friends, setFriends] = useState<Friend[]>([]);
   const [requests, setRequests] = useState<FriendRequest[]>([]);
+  const [sentRequests, setSentRequests] = useState<FriendRequest[]>([]);
   const [blockedUsers, setBlockedUsers] = useState<BlockedUser[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -39,6 +40,18 @@ export const useFriends = () => {
     }
   }, [isAuthenticated]);
 
+  const fetchSentRequests = useCallback(async () => {
+    if (!isAuthenticated) return;
+    try {
+      const res = await friendService.getSentRequests();
+      if (res.success && Array.isArray(res.data)) {
+        setSentRequests(res.data);
+      }
+    } catch (err) {
+      console.error("Failed to load sent friend requests", err);
+    }
+  }, [isAuthenticated]);
+
   const fetchBlocked = useCallback(async () => {
     if (!isAuthenticated) return;
     try {
@@ -53,9 +66,14 @@ export const useFriends = () => {
 
   const refreshAll = useCallback(async () => {
     setIsLoading(true);
-    await Promise.all([fetchFriends(), fetchRequests(), fetchBlocked()]);
+    await Promise.all([
+      fetchFriends(),
+      fetchRequests(),
+      fetchSentRequests(),
+      fetchBlocked(),
+    ]);
     setIsLoading(false);
-  }, [fetchFriends, fetchRequests, fetchBlocked]);
+  }, [fetchFriends, fetchRequests, fetchSentRequests, fetchBlocked]);
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -65,7 +83,16 @@ export const useFriends = () => {
 
   const sendRequest = async (receiverId: string) => {
     const res = await friendService.sendFriendRequest(receiverId);
-    await fetchRequests();
+    await Promise.all([fetchRequests(), fetchSentRequests()]);
+    return res;
+  };
+
+  const cancelRequest = async (requestId: string) => {
+    const res = await friendService.cancelFriendRequest(requestId);
+    setSentRequests((prev) =>
+      prev.filter((r) => r.id !== requestId && r.receiver_id !== requestId)
+    );
+    await fetchSentRequests();
     return res;
   };
 
@@ -84,16 +111,14 @@ export const useFriends = () => {
 
   const blockUser = async (userId: string) => {
     const res = await friendService.blockUser(userId);
-    // Remove from friends list immediately
-    setFriends((prev) => prev.filter((f) => f.id !== userId));
     await fetchBlocked();
     return res;
   };
 
   const unblockUser = async (userId: string) => {
     const res = await friendService.unblockUser(userId);
-    // Remove from blocked list immediately
     setBlockedUsers((prev) => prev.filter((b) => b.id !== userId));
+    await fetchFriends();
     return res;
   };
 
@@ -104,14 +129,17 @@ export const useFriends = () => {
   return {
     friends,
     requests,
+    sentRequests,
     blockedUsers,
     isLoading,
     error,
     refreshAll,
     fetchFriends,
     fetchRequests,
+    fetchSentRequests,
     fetchBlocked,
     sendRequest,
+    cancelRequest,
     respondRequest,
     blockUser,
     unblockUser,

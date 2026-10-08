@@ -22,6 +22,22 @@ export const friendService = {
     return res.data;
   },
 
+  async getSentRequests(): Promise<ApiResponse<FriendRequest[]>> {
+    const res = await apiClient.get<ApiResponse<FriendRequest[]>>(
+      "/friends/requests/sent"
+    );
+    return res.data;
+  },
+
+  async cancelFriendRequest(
+    requestIdOrReceiverId: string
+  ): Promise<ApiResponse<any>> {
+    const res = await apiClient.delete<ApiResponse<any>>(
+      `/friends/requests/${requestIdOrReceiverId}`
+    );
+    return res.data;
+  },
+
   async respondRequest(
     requestId: string,
     action: "accept" | "reject"

@@ -11,6 +11,7 @@ interface BlockedUsersModalProps {
   onClose: () => void;
   blockedUsers: BlockedUser[];
   onUnblock: (userId: string) => Promise<any>;
+  onOpenChatWithUser?: (userId: string) => void;
 }
 
 export const BlockedUsersModal: React.FC<BlockedUsersModalProps> = ({
@@ -18,6 +19,7 @@ export const BlockedUsersModal: React.FC<BlockedUsersModalProps> = ({
   onClose,
   blockedUsers,
   onUnblock,
+  onOpenChatWithUser,
 }) => {
   const [unblockingId, setUnblockingId] = useState<string | null>(null);
 

@@ -3,30 +3,36 @@
 import React, { useState } from "react";
 import { useNearby } from "@/hooks/useNearby";
 import { Avatar } from "@/components/ui/Avatar";
-import { Friend } from "@/types/friend.types";
+import { Friend, FriendRequest } from "@/types/friend.types";
 import { useToast } from "@/context/ToastContext";
 import {
   Compass,
   MapPin,
   Navigation,
   UserPlus,
+  UserX,
   MessageCircle,
   Loader2,
   Sliders,
   ShieldAlert,
 } from "lucide-react";
+import { BlockUserModal } from "../friends/BlockUserModal";
 
 interface NearbyRadarProps {
   friends: Friend[];
+  sentRequests?: FriendRequest[];
   onOpenChat: (contact: Friend) => void;
   onSendFriendRequest: (userId: string) => Promise<any>;
+  onCancelFriendRequest?: (requestIdOrUserId: string) => Promise<any>;
   onBlockUser: (userId: string) => Promise<any>;
 }
 
 export const NearbyRadar: React.FC<NearbyRadarProps> = ({
   friends,
+  sentRequests = [],
   onOpenChat,
   onSendFriendRequest,
+  onCancelFriendRequest,
   onBlockUser,
 }) => {
   const {
@@ -50,8 +56,41 @@ export const NearbyRadar: React.FC<NearbyRadarProps> = ({
   const [requestedUserIds, setRequestedUserIds] = useState<Set<string>>(
     new Set()
   );
+  const [userToBlock, setUserToBlock] = useState<{ id: string; name: string } | null>(null);
 
   const friendIdSet = new Set(friends.map((f) => f.id));
+
+  const sentRequestMap = React.useMemo(() => {
+    const map = new Map<string, string>();
+    sentRequests?.forEach((req) => {
+      if (req.receiver_id) map.set(req.receiver_id, req.id);
+    });
+    return map;
+  }, [sentRequests]);
+
+  const handleCancelRequest = async (userId: string, userName: string) => {
+    if (!onCancelFriendRequest) return;
+    try {
+      const reqId = sentRequestMap.get(userId) || userId;
+      setRequestedUserIds((prev) => {
+        const next = new Set(prev);
+        next.delete(userId);
+        return next;
+      });
+      await onCancelFriendRequest(reqId);
+      showToast({
+        title: "Request Cancelled",
+        description: `Cancelled friend request to ${userName}`,
+        type: "info",
+      });
+    } catch (err: any) {
+      showToast({
+        title: "Could Not Cancel Request",
+        description: err.response?.data?.message || err.message,
+        type: "info",
+      });
+    }
+  };
 
   const handleSendRequest = async (userId: string, userName: string) => {
     try {
@@ -248,7 +287,7 @@ export const NearbyRadar: React.FC<NearbyRadarProps> = ({
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {nearbyUsers.map((user) => {
             const isAlreadyFriend = friendIdSet.has(user.id);
-            const isRequested = requestedUserIds.has(user.id);
+            const isRequested = requestedUserIds.has(user.id) || sentRequestMap.has(user.id);
 
             return (
               <div
@@ -309,27 +348,27 @@ export const NearbyRadar: React.FC<NearbyRadarProps> = ({
                       <MessageCircle className="w-3.5 h-3.5" />
                       <span>Chat</span>
                     </button>
+                  ) : isRequested ? (
+                    <button
+                      onClick={() => handleCancelRequest(user.id, user.name)}
+                      className="flex-1 flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl text-xs font-semibold bg-rose-500/10 hover:bg-rose-500/20 text-rose-300 border border-rose-500/30 transition-all shadow-sm"
+                      title="Cancel sent friend request"
+                    >
+                      <UserX className="w-3.5 h-3.5" />
+                      <span>Cancel Request</span>
+                    </button>
                   ) : (
                     <button
                       onClick={() => handleSendRequest(user.id, user.name)}
-                      disabled={isRequested}
-                      className={`flex-1 flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl text-xs font-semibold transition-all ${
-                        isRequested
-                          ? "bg-surface-100 text-slate-500 border border-card-border cursor-not-allowed"
-                          : "bg-surface-100 hover:bg-brand text-slate-200 hover:text-white border border-card-border hover:border-brand shadow-sm"
-                      }`}
+                      className="flex-1 flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl text-xs font-semibold bg-surface-100 hover:bg-brand text-slate-200 hover:text-white border border-card-border hover:border-brand shadow-sm transition-all"
                     >
                       <UserPlus className="w-3.5 h-3.5" />
-                      <span>{isRequested ? "Request Sent" : "Add Friend"}</span>
+                      <span>Add Friend</span>
                     </button>
                   )}
 
                   <button
-                    onClick={() => {
-                      if (confirm(`Block ${user.name}?`)) {
-                        onBlockUser(user.id);
-                      }
-                    }}
+                    onClick={() => setUserToBlock({ id: user.id, name: user.name })}
                     className="p-2 rounded-xl text-slate-500 hover:text-rose-400 hover:bg-rose-500/10 transition-colors"
                     title="Block user"
                   >
@@ -341,6 +380,16 @@ export const NearbyRadar: React.FC<NearbyRadarProps> = ({
           })}
         </div>
       )}
+
+      {/* Block Confirmation Modal */}
+      <BlockUserModal
+        isOpen={!!userToBlock}
+        onClose={() => setUserToBlock(null)}
+        user={userToBlock}
+        onConfirmBlock={async (userId) => {
+          await onBlockUser(userId);
+        }}
+      />
     </div>
   );
 };
