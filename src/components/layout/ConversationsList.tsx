@@ -24,9 +24,9 @@ export const ConversationsList: React.FC<ConversationsListProps> = ({
   isBlocked,
 }) => {
   const [searchQuery, setSearchQuery] = useState("");
-  const { presenceMap, typingMap, unreadTotal } = useWebSocket();
+  const { presenceMap, typingMap, unreadCountsByContact } = useWebSocket();
 
-  // Filter friends based on search query
+  // Filter friends based on search query (include blocked users so conversation stays visible)
   const filteredFriends = useMemo(() => {
     if (!searchQuery.trim()) return friends;
     const q = searchQuery.toLowerCase();
@@ -37,10 +37,14 @@ export const ConversationsList: React.FC<ConversationsListProps> = ({
     );
   }, [friends, searchQuery]);
 
-  // Identify currently active (online) friends for the top rail (exclude blocked)
+  // Identify currently active (online) friends for the top rail (exclude blocked and blockers)
   const activeFriends = useMemo(() => {
     return friends.filter(
-      (f) => presenceMap[f.id]?.status === "online" && !isBlocked?.(f.id)
+      (f) =>
+        presenceMap[f.id]?.status === "online" &&
+        !isBlocked?.(f.id) &&
+        !f.is_blocked_by &&
+        !presenceMap[f.id]?.isBlockedBy
     );
   }, [friends, presenceMap, isBlocked]);
 
@@ -56,13 +60,8 @@ export const ConversationsList: React.FC<ConversationsListProps> = ({
       {/* Top Header */}
       <div className="p-4 pb-2">
         <div className="flex items-center justify-between mb-3.5">
-          <h1 className="text-xl font-bold tracking-tight text-white flex items-center gap-2">
-            <span>Messages</span>
-            {unreadTotal > 0 && (
-              <Badge variant="purple" size="sm">
-                {unreadTotal}
-              </Badge>
-            )}
+          <h1 className="text-xl font-bold tracking-tight text-white">
+            Messages
           </h1>
           {onOpenNearby && (
             <button
@@ -157,14 +156,19 @@ export const ConversationsList: React.FC<ConversationsListProps> = ({
               {filteredFriends.map((friend, idx) => {
                 const isSelected = activeContactId === friend.id;
                 const presence = presenceMap[friend.id];
-                const isOnline = presence?.status === "online";
-                const lastSeen =
-                  presence?.lastSeen !== undefined
-                    ? presence.lastSeen
-                    : friend.last_seen;
-                const isTyping = !!typingMap[friend.id];
+                const blocked = isBlocked?.(friend.id) || friend.is_blocked || false;
+                const isBlockedBy = Boolean(
+                  friend.is_blocked_by || presence?.isBlockedBy
+                );
+                const isOnline = isBlockedBy ? false : presence?.status === "online";
+                const lastSeen = isBlockedBy
+                  ? null
+                  : presence?.lastSeen !== undefined
+                  ? presence.lastSeen
+                  : friend.last_seen;
+                const isTyping = isBlockedBy ? false : !!typingMap[friend.id];
                 const ring = avatarRings[idx % avatarRings.length];
-                const blocked = isBlocked?.(friend.id) || false;
+                const unreadCount = unreadCountsByContact[friend.id] || 0;
 
                 return (
                   <button
@@ -180,7 +184,7 @@ export const ConversationsList: React.FC<ConversationsListProps> = ({
                       src={friend.profile_picture}
                       name={friend.name}
                       size="md"
-                      isOnline={blocked ? false : isOnline}
+                      isOnline={blocked || isBlockedBy ? false : isOnline}
                       ringColor={ring}
                     />
 
@@ -194,7 +198,7 @@ export const ConversationsList: React.FC<ConversationsListProps> = ({
                             <span className="text-[10px] text-rose-400 font-semibold bg-rose-500/10 px-1.5 py-0.5 rounded border border-rose-500/20">
                               Blocked
                             </span>
-                          ) : isOnline ? (
+                          ) : isBlockedBy ? null : isOnline ? (
                             <span className="text-emerald-400 font-medium">Online</span>
                           ) : (
                             formatLastSeenCompact(lastSeen)
@@ -202,15 +206,22 @@ export const ConversationsList: React.FC<ConversationsListProps> = ({
                         </span>
                       </div>
 
-                      <p className="text-xs text-slate-400 truncate">
-                        {isTyping ? (
-                          <span className="text-brand-light font-medium animate-pulse">
-                            typing...
+                      <div className="flex items-center justify-between gap-1">
+                        <p className="text-xs text-slate-400 truncate flex-1">
+                          {isTyping ? (
+                            <span className="text-brand-light font-medium animate-pulse">
+                              typing...
+                            </span>
+                          ) : (
+                            `@${friend.username}`
+                          )}
+                        </p>
+                        {unreadCount > 0 && !blocked && !isSelected && (
+                          <span className="shrink-0 flex items-center justify-center min-w-[20px] h-[20px] px-1.5 text-[11px] font-bold rounded-full bg-brand text-white shadow-glow-sm animate-in fade-in">
+                            {unreadCount > 99 ? "99+" : unreadCount}
                           </span>
-                        ) : (
-                          `@${friend.username}`
                         )}
-                      </p>
+                      </div>
                     </div>
                   </button>
                 );

@@ -19,6 +19,7 @@ interface ChatHeaderProps {
   isOnline?: boolean;
   lastSeen?: string | null;
   isBlocked?: boolean;
+  isBlockedBy?: boolean;
   onBackMobile?: () => void;
   onBlockToggle?: () => void;
   onViewProfile?: () => void;
@@ -32,12 +33,15 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({
   isOnline = false,
   lastSeen,
   isBlocked = false,
+  isBlockedBy = false,
   onBackMobile,
   onBlockToggle,
   onViewProfile,
 }) => {
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
+
+  const effectiveOnline = !isBlocked && !isBlockedBy && isOnline;
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -72,7 +76,7 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({
             src={contactAvatar}
             name={contactName}
             size="md"
-            isOnline={isOnline}
+            isOnline={effectiveOnline}
             ringColor="cyan"
           />
         </div>
@@ -89,23 +93,25 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({
             )}
           </div>
 
-          <div className="flex items-center gap-1.5 mt-0.5">
-            {isOnline ? (
-              <span className="text-xs font-medium text-emerald-400 flex items-center gap-1">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                Online
-              </span>
-            ) : (
-              <span className="text-xs text-slate-400">
-                {formatLastSeen(lastSeen)}
-              </span>
-            )}
-            {isBlocked && (
-              <span className="ml-1 text-[10px] text-rose-400 font-semibold bg-rose-500/10 px-1.5 py-0.2 rounded border border-rose-500/20">
-                Blocked
-              </span>
-            )}
-          </div>
+          {!isBlockedBy && (
+            <div className="flex items-center gap-1.5 mt-0.5">
+              {!isBlocked && effectiveOnline ? (
+                <span className="text-xs font-medium text-emerald-400 flex items-center gap-1">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                  Online
+                </span>
+              ) : (
+                <span className="text-xs text-slate-400">
+                  {isBlocked ? "Offline" : formatLastSeen(lastSeen)}
+                </span>
+              )}
+              {isBlocked && (
+                <span className="ml-1 text-[10px] text-rose-400 font-semibold bg-rose-500/10 px-1.5 py-0.2 rounded border border-rose-500/20">
+                  Blocked
+                </span>
+              )}
+            </div>
+          )}
         </div>
       </div>
 

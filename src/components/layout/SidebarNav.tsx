@@ -19,6 +19,7 @@ interface SidebarNavProps {
   currentTab: NavTab;
   onSelectTab: (tab: NavTab) => void;
   pendingRequestsCount: number;
+  unreadMessagesCount?: number;
   onOpenProfile: () => void;
 }
 
@@ -26,6 +27,7 @@ export const SidebarNav: React.FC<SidebarNavProps> = ({
   currentTab,
   onSelectTab,
   pendingRequestsCount,
+  unreadMessagesCount = 0,
   onOpenProfile,
 }) => {
   const { user, logout } = useAuth();
@@ -35,7 +37,7 @@ export const SidebarNav: React.FC<SidebarNavProps> = ({
       id: "chats" as NavTab,
       label: "Messages",
       icon: MessageSquare,
-      badge: 0,
+      badge: unreadMessagesCount,
     },
     {
       id: "nearby" as NavTab,

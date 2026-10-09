@@ -12,12 +12,14 @@ export const useChat = (activeContactId: string | null) => {
   const {
     sendMessageWs,
     sendReadWs,
+    sendReadConversationWs,
     sendEditWs,
     sendDeleteForMeWs,
     sendDeleteForEveryoneWs,
     subscribe,
     isConnected,
     setUnreadTotal,
+    clearUnreadForContact,
   } = useWebSocket();
 
   const [messages, setMessages] = useState<Message[]>([]);
@@ -37,22 +39,49 @@ export const useChat = (activeContactId: string | null) => {
     (msgList: Message[]) => {
       if (!currentUserId || !activeContactId) return;
 
+      // Clear unread badge for this contact in sidebar and contacts list immediately
+      clearUnreadForContact(activeContactId);
+
       // Only mark as read if the document/tab is currently visible
       if (typeof document !== "undefined" && document.visibilityState !== "visible") {
         return;
       }
 
-      msgList.forEach((msg) => {
-        if (
-          msg.receiverId === currentUserId &&
-          msg.senderId === activeContactId &&
-          msg.status !== "read"
-        ) {
-          sendReadWs(msg._id);
-        }
-      });
+      // Filter unread incoming messages from the active contact
+      const unreadIncoming = msgList.filter(
+        (m) =>
+          String(m.receiverId) === String(currentUserId) &&
+          String(m.senderId) === String(activeContactId) &&
+          m.status !== "read" &&
+          !m._id.startsWith("temp-")
+      );
+
+      // Optimistically mark them as read in local state
+      if (unreadIncoming.length > 0) {
+        setMessages((prev) =>
+          prev.map((m) =>
+            String(m.receiverId) === String(currentUserId) &&
+            String(m.senderId) === String(activeContactId) &&
+            m.status !== "read"
+              ? { ...m, status: "read" }
+              : m
+          )
+        );
+
+        // Send individual read WS events (ensures compatibility with all backend versions)
+        unreadIncoming.forEach((m) => {
+          sendReadWs(m._id);
+        });
+
+        setUnreadTotal((prev) => Math.max(0, prev - unreadIncoming.length));
+      }
+
+      // Send conversation read event via WS
+      sendReadConversationWs(activeContactId);
+      // Also send HTTP fallback
+      messageService.markConversationAsRead(activeContactId).catch(() => {});
     },
-    [currentUserId, activeContactId, sendReadWs]
+    [currentUserId, activeContactId, clearUnreadForContact, sendReadWs, sendReadConversationWs, setUnreadTotal]
   );
 
   // When user returns to this tab / window, mark any unread messages as read
@@ -97,7 +126,7 @@ export const useChat = (activeContactId: string | null) => {
         setNextCursor(res.data.nextCursor);
         setHasMore(res.data.hasMore);
 
-        // Mark incoming messages as read
+        // Mark incoming messages as read and clear unread count
         markMessagesAsRead(fetchedMessages);
       }
     } catch (err: any) {
@@ -162,24 +191,39 @@ export const useChat = (activeContactId: string | null) => {
       if (payload.type === "message") {
         const msg = payload.data;
         const isCurrentConversation =
-          (msg.senderId === currentUserId && msg.receiverId === contactId) ||
-          (msg.senderId === contactId && msg.receiverId === currentUserId);
+          (String(msg.senderId) === String(currentUserId) && String(msg.receiverId) === String(contactId)) ||
+          (String(msg.senderId) === String(contactId) && String(msg.receiverId) === String(currentUserId));
 
         if (isCurrentConversation) {
           setMessages((prev) => {
-            if (prev.some((m) => m._id === msg._id)) {
-              return prev.map((m) => (m._id === msg._id ? msg : m));
+            // Check if there is an optimistic temp message matching this content
+            const tempIdx = prev.findIndex(
+              (m) =>
+                m._id.startsWith("temp-") &&
+                m.content === msg.content &&
+                String(m.senderId) === String(msg.senderId)
+            );
+
+            if (tempIdx !== -1) {
+              const updated = [...prev];
+              updated[tempIdx] = msg;
+              return updated;
+            }
+
+            if (prev.some((m) => String(m._id) === String(msg._id))) {
+              return prev.map((m) => (String(m._id) === String(msg._id) ? msg : m));
             }
             return [...prev, msg];
           });
 
-          // If incoming from active contact and tab is currently visible, mark read
-          if (msg.senderId === contactId && msg.receiverId === currentUserId) {
+          // If incoming from active contact and tab is currently visible, mark read immediately
+          if (String(msg.senderId) === String(contactId) && String(msg.receiverId) === String(currentUserId)) {
             if (
               typeof document !== "undefined" &&
               document.visibilityState === "visible"
             ) {
               sendReadWs(msg._id);
+              clearUnreadForContact(contactId);
               setUnreadTotal((prev) => Math.max(0, prev - 1));
             }
           }
@@ -190,7 +234,7 @@ export const useChat = (activeContactId: string | null) => {
         const updated = payload.data;
         setMessages((prev) =>
           prev.map((m) =>
-            m._id === updated._id ? { ...m, status: "read" } : m
+            String(m._id) === String(updated._id) ? { ...m, status: "read" } : m
           )
         );
       }
@@ -199,7 +243,7 @@ export const useChat = (activeContactId: string | null) => {
         const updated = payload.data;
         setMessages((prev) =>
           prev.map((m) =>
-            m._id === updated._id
+            String(m._id) === String(updated._id)
               ? { ...m, content: updated.content, editedAt: updated.editedAt }
               : m
           )
@@ -208,25 +252,42 @@ export const useChat = (activeContactId: string | null) => {
 
       if (payload.type === "message_deleted_for_me") {
         const { messageId } = payload.data;
-        setMessages((prev) => prev.filter((m) => m._id !== messageId));
+        setMessages((prev) => prev.filter((m) => String(m._id) !== String(messageId)));
       }
 
       if (payload.type === "message_deleted_for_everyone") {
         const { messageId } = payload.data;
-        setMessages((prev) => prev.filter((m) => m._id !== messageId));
+        setMessages((prev) => prev.filter((m) => String(m._id) !== String(messageId)));
       }
     });
 
     return () => {
       unsubscribe();
     };
-  }, [subscribe, currentUserId, sendReadWs, setUnreadTotal]);
+  }, [subscribe, currentUserId, sendReadWs, setUnreadTotal, clearUnreadForContact]);
 
-  // Send message
+  // Send message with instant optimistic update
   const sendMessage = async (content: string) => {
-    if (!activeContactId || !content.trim()) return;
+    if (!activeContactId || !content.trim() || !currentUserId) return;
 
     const trimmed = content.trim();
+    const tempId = `temp-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
+
+    const optimisticMsg: Message = {
+      _id: tempId,
+      conversationId: "",
+      senderId: currentUserId,
+      receiverId: activeContactId,
+      content: trimmed,
+      status: "sent",
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      deletedFor: [],
+    };
+
+    // Optimistically insert message immediately so UI shows single tick instantly
+    setMessages((prev) => [...prev, optimisticMsg]);
+
     let sentWs = false;
 
     if (isConnected) {
@@ -238,12 +299,18 @@ export const useChat = (activeContactId: string | null) => {
         const res = await messageService.sendMessage(activeContactId, trimmed);
         if (res.success && res.data) {
           setMessages((prev) => {
+            const hasTemp = prev.some((m) => m._id === tempId);
+            if (hasTemp) {
+              return prev.map((m) => (m._id === tempId ? res.data : m));
+            }
             if (prev.some((m) => m._id === res.data._id)) return prev;
             return [...prev, res.data];
           });
         }
       } catch (err: any) {
         console.error("Failed to send message:", err);
+        // Remove optimistic message if send failed
+        setMessages((prev) => prev.filter((m) => m._id !== tempId));
         setError(err.response?.data?.message || err.message || "Failed to send message");
       }
     }

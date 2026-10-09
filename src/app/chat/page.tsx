@@ -42,7 +42,7 @@ export default function ChatDashboardPage() {
     updateLocation,
   } = useNearby(10);
 
-  const { subscribe, presenceMap } = useWebSocket();
+  const { subscribe, presenceMap, unreadSendersCount } = useWebSocket();
   const { showToast } = useToast();
 
   const [currentTab, setCurrentTab] = useState<NavTab>("chats");
@@ -147,6 +147,7 @@ export default function ChatDashboardPage() {
           currentTab={currentTab}
           onSelectTab={handleTabSelect}
           pendingRequestsCount={requests.length}
+          unreadMessagesCount={unreadSendersCount}
           onOpenProfile={() => setIsProfileOpen(true)}
         />
 
@@ -200,6 +201,7 @@ export default function ChatDashboardPage() {
               {activeContact ? (
                 <div className="w-full h-full">
                   <ChatArea
+                    key={activeContact.id}
                     contact={activeContact}
                     isBlocked={isBlocked(activeContact.id)}
                     onBlockToggle={handleBlockToggle}
@@ -242,6 +244,7 @@ export default function ChatDashboardPage() {
               onSendFriendRequest={sendRequest}
               onCancelFriendRequest={cancelRequest}
               onBlockUser={blockUser}
+              isBlocked={isBlocked}
             />
           </div>
         )}
@@ -254,6 +257,7 @@ export default function ChatDashboardPage() {
               onOpenChat={handleOpenChatWithContact}
               onBlockUser={blockUser}
               onExploreNearby={() => setCurrentTab("nearby")}
+              isBlocked={isBlocked}
             />
           </div>
         )}
@@ -314,17 +318,32 @@ export default function ChatDashboardPage() {
           contact={contactProfileToView}
           isOnline={
             contactProfileToView
-              ? presenceMap[contactProfileToView.id]?.status === "online"
+              ? Boolean(
+                  !contactProfileToView.is_blocked_by &&
+                    !presenceMap[contactProfileToView.id]?.isBlockedBy &&
+                    presenceMap[contactProfileToView.id]?.status === "online"
+                )
               : false
           }
           lastSeen={
             contactProfileToView
-              ? (presenceMap[contactProfileToView.id]?.lastSeen ??
-                contactProfileToView.last_seen)
+              ? contactProfileToView.is_blocked_by ||
+                presenceMap[contactProfileToView.id]?.isBlockedBy
+                ? null
+                : (presenceMap[contactProfileToView.id]?.lastSeen ??
+                  contactProfileToView.last_seen)
               : null
           }
           isBlocked={
             contactProfileToView ? isBlocked(contactProfileToView.id) : false
+          }
+          isBlockedBy={
+            contactProfileToView
+              ? Boolean(
+                  contactProfileToView.is_blocked_by ||
+                    presenceMap[contactProfileToView.id]?.isBlockedBy
+                )
+              : false
           }
           onBlockToggle={async () => {
             if (!contactProfileToView) return;

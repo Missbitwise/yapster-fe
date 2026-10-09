@@ -111,14 +111,14 @@ export const useFriends = () => {
 
   const blockUser = async (userId: string) => {
     const res = await friendService.blockUser(userId);
-    await fetchBlocked();
+    await Promise.all([fetchFriends(), fetchBlocked()]);
     return res;
   };
 
   const unblockUser = async (userId: string) => {
     const res = await friendService.unblockUser(userId);
     setBlockedUsers((prev) => prev.filter((b) => b.id !== userId));
-    await fetchFriends();
+    await Promise.all([fetchFriends(), fetchBlocked()]);
     return res;
   };
 

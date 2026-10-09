@@ -14,6 +14,7 @@ interface ContactProfileModalProps {
   isOnline?: boolean;
   lastSeen?: string | null;
   isBlocked?: boolean;
+  isBlockedBy?: boolean;
   onBlockToggle?: () => void;
   onSendMessage?: () => void;
 }
@@ -25,12 +26,14 @@ export const ContactProfileModal: React.FC<ContactProfileModalProps> = ({
   isOnline = false,
   lastSeen,
   isBlocked = false,
+  isBlockedBy = false,
   onBlockToggle,
   onSendMessage,
 }) => {
   if (!contact) return null;
 
   const joinDateFormatted = formatJoinDate(contact.created_at || contact.friends_since);
+  const effectiveOnline = !isBlocked && !isBlockedBy && isOnline;
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} title="User Profile" maxWidth="sm">
@@ -41,7 +44,7 @@ export const ContactProfileModal: React.FC<ContactProfileModalProps> = ({
             name={contact.name}
             size="xl"
             ringColor="purple"
-            isOnline={isOnline}
+            isOnline={effectiveOnline}
           />
         </div>
 
@@ -54,18 +57,20 @@ export const ContactProfileModal: React.FC<ContactProfileModalProps> = ({
             <span>{contact.username}</span>
           </div>
 
-          <div className="mt-1.5 flex items-center justify-center gap-1.5 text-[11px]">
-            {isOnline ? (
-              <span className="text-emerald-400 font-semibold flex items-center gap-1">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                Online Now
-              </span>
-            ) : (
-              <span className="text-slate-400">
-                {formatLastSeen(lastSeen ?? contact.last_seen)}
-              </span>
-            )}
-          </div>
+          {!isBlockedBy && (
+            <div className="mt-1.5 flex items-center justify-center gap-1.5 text-[11px]">
+              {!isBlocked && effectiveOnline ? (
+                <span className="text-emerald-400 font-semibold flex items-center gap-1">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                  Online Now
+                </span>
+              ) : (
+                <span className="text-slate-400">
+                  {isBlocked ? "Offline" : formatLastSeen(lastSeen ?? contact.last_seen)}
+                </span>
+              )}
+            </div>
+          )}
         </div>
 
         {/* Bio Section - Only displayed when other user views profile */}

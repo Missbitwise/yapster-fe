@@ -13,6 +13,7 @@ interface FriendsTabProps {
   onOpenChat: (friend: Friend) => void;
   onBlockUser: (userId: string) => Promise<any>;
   onExploreNearby?: () => void;
+  isBlocked?: (userId: string) => boolean;
 }
 
 export const FriendsTab: React.FC<FriendsTabProps> = ({
@@ -20,20 +21,22 @@ export const FriendsTab: React.FC<FriendsTabProps> = ({
   onOpenChat,
   onBlockUser,
   onExploreNearby,
+  isBlocked,
 }) => {
   const [search, setSearch] = useState("");
   const [userToBlock, setUserToBlock] = useState<Friend | null>(null);
   const { presenceMap } = useWebSocket();
 
   const filtered = useMemo(() => {
-    if (!search.trim()) return friends;
+    const list = friends.filter((f) => !isBlocked?.(f.id) && !f.is_blocked);
+    if (!search.trim()) return list;
     const q = search.toLowerCase();
-    return friends.filter(
+    return list.filter(
       (f) =>
         f.name.toLowerCase().includes(q) ||
         f.username.toLowerCase().includes(q)
     );
-  }, [friends, search]);
+  }, [friends, search, isBlocked]);
 
   return (
     <div className="flex flex-col h-full bg-surface-300 p-4 sm:p-6 overflow-y-auto">
@@ -41,7 +44,7 @@ export const FriendsTab: React.FC<FriendsTabProps> = ({
         <div>
           <h2 className="text-xl sm:text-2xl font-bold text-white flex items-center gap-2">
             <Users className="w-6 h-6 text-brand" />
-            <span>My Friends ({friends.length})</span>
+            <span>My Friends ({filtered.length})</span>
           </h2>
           <p className="text-xs text-slate-400 mt-1">
             People you are connected with on Yapster.
@@ -85,11 +88,15 @@ export const FriendsTab: React.FC<FriendsTabProps> = ({
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {filtered.map((friend) => {
             const presence = presenceMap[friend.id];
-            const isOnline = presence?.status === "online";
-            const lastSeen =
-              presence?.lastSeen !== undefined
-                ? presence.lastSeen
-                : friend.last_seen;
+            const isBlockedBy = Boolean(
+              friend.is_blocked_by || presence?.isBlockedBy
+            );
+            const isOnline = isBlockedBy ? false : presence?.status === "online";
+            const lastSeen = isBlockedBy
+              ? null
+              : presence?.lastSeen !== undefined
+              ? presence.lastSeen
+              : friend.last_seen;
 
             return (
               <div
@@ -102,7 +109,7 @@ export const FriendsTab: React.FC<FriendsTabProps> = ({
                       src={friend.profile_picture}
                       name={friend.name}
                       size="lg"
-                      isOnline={isOnline}
+                      isOnline={isBlockedBy ? false : isOnline}
                       ringColor="purple"
                     />
                     <div className="min-w-0">
@@ -112,15 +119,17 @@ export const FriendsTab: React.FC<FriendsTabProps> = ({
                       <p className="text-xs text-slate-400 truncate">
                         @{friend.username}
                       </p>
-                      <span className="text-[11px] font-medium text-slate-400">
-                        {isOnline ? (
-                          <span className="text-emerald-400 font-semibold">
-                            Online
-                          </span>
-                        ) : (
-                          formatLastSeen(lastSeen)
-                        )}
-                      </span>
+                      {!isBlockedBy && (
+                        <span className="text-[11px] font-medium text-slate-400">
+                          {isOnline ? (
+                            <span className="text-emerald-400 font-semibold">
+                              Online
+                            </span>
+                          ) : (
+                            formatLastSeen(lastSeen)
+                          )}
+                        </span>
+                      )}
                     </div>
                   </div>
                 </div>

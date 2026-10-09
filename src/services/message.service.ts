@@ -40,4 +40,30 @@ export const messageService = {
     );
     return res.data;
   },
+
+  async markConversationAsRead(
+    contactId: string
+  ): Promise<ApiResponse<{ readCount: number; totalUnread: number }>> {
+    const res = await apiClient.patch<
+      ApiResponse<{ readCount: number; totalUnread: number }>
+    >(`/messages/read-conversation/${contactId}`);
+    return res.data;
+  },
+
+  async getUnreadSummary(): Promise<
+    ApiResponse<{
+      unreadBySender: Record<string, number>;
+      unreadSendersCount: number;
+      totalUnread: number;
+    }>
+  > {
+    const res = await apiClient.get<
+      ApiResponse<{
+        unreadBySender: Record<string, number>;
+        unreadSendersCount: number;
+        totalUnread: number;
+      }>
+    >("/messages/unread-summary");
+    return res.data;
+  },
 };

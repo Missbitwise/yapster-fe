@@ -25,6 +25,7 @@ interface NearbyRadarProps {
   onSendFriendRequest: (userId: string) => Promise<any>;
   onCancelFriendRequest?: (requestIdOrUserId: string) => Promise<any>;
   onBlockUser: (userId: string) => Promise<any>;
+  isBlocked?: (userId: string) => boolean;
 }
 
 export const NearbyRadar: React.FC<NearbyRadarProps> = ({
@@ -34,6 +35,7 @@ export const NearbyRadar: React.FC<NearbyRadarProps> = ({
   onSendFriendRequest,
   onCancelFriendRequest,
   onBlockUser,
+  isBlocked,
 }) => {
   const {
     radius,
@@ -67,6 +69,10 @@ export const NearbyRadar: React.FC<NearbyRadarProps> = ({
     });
     return map;
   }, [sentRequests]);
+
+  const visibleNearbyUsers = React.useMemo(() => {
+    return nearbyUsers.filter((u) => !isBlocked?.(u.id));
+  }, [nearbyUsers, isBlocked]);
 
   const handleCancelRequest = async (userId: string, userName: string) => {
     if (!onCancelFriendRequest) return;
@@ -263,7 +269,7 @@ export const NearbyRadar: React.FC<NearbyRadarProps> = ({
           <Loader2 className="w-8 h-8 animate-spin text-brand mb-2" />
           <p className="text-xs">Scanning for people nearby within {radius} km...</p>
         </div>
-      ) : nearbyUsers.length === 0 ? (
+      ) : visibleNearbyUsers.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-20 text-center text-slate-400 bg-surface-200/40 border border-card-border/60 rounded-3xl p-8">
           <Compass className="w-12 h-12 text-slate-600 mb-3" />
           <h3 className="text-base font-semibold text-white mb-1">
@@ -285,15 +291,15 @@ export const NearbyRadar: React.FC<NearbyRadarProps> = ({
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {nearbyUsers.map((user) => {
-            const isAlreadyFriend = friendIdSet.has(user.id);
-            const isRequested = requestedUserIds.has(user.id) || sentRequestMap.has(user.id);
+          {visibleNearbyUsers.map((user) => {
+              const isAlreadyFriend = friendIdSet.has(user.id);
+              const isRequested = requestedUserIds.has(user.id) || sentRequestMap.has(user.id);
 
-            return (
-              <div
-                key={user.id}
-                className="bg-card border border-card-border hover:border-brand/50 rounded-3xl p-5 shadow-lg flex flex-col justify-between transition-all group hover:shadow-glow-sm"
-              >
+              return (
+                <div
+                  key={user.id}
+                  className="bg-card border border-card-border hover:border-brand/50 rounded-3xl p-5 shadow-lg flex flex-col justify-between transition-all group hover:shadow-glow-sm"
+                >
                 <div>
                   <div className="flex items-start justify-between gap-3 mb-3">
                     <Avatar

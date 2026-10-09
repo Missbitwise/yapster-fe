@@ -5,6 +5,8 @@ export interface Friend {
   profile_picture?: string | null;
   bio?: string | null;
   last_seen?: string | null;
+  is_blocked_by?: boolean;
+  is_blocked?: boolean;
   friends_since: string;
   created_at?: string;
 }

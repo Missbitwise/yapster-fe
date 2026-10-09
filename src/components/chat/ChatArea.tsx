@@ -51,18 +51,25 @@ export const ChatArea: React.FC<ChatAreaProps> = ({
   const [editingMessage, setEditingMessage] = useState<Message | null>(null);
 
   const presence = presenceMap[contact.id];
-  const isOnline = presence?.status === "online";
-  const lastSeen = presence?.lastSeen !== undefined ? presence.lastSeen : contact.last_seen;
-  const isTyping = !!typingMap[contact.id];
+  const isBlockedByContact = Boolean(
+    contact.is_blocked_by || presence?.isBlockedBy
+  );
+  const isOnline = isBlockedByContact ? false : presence?.status === "online";
+  const lastSeen = isBlockedByContact
+    ? null
+    : presence?.lastSeen !== undefined
+    ? presence.lastSeen
+    : contact.last_seen;
+  const isTyping = isBlockedByContact ? false : !!typingMap[contact.id];
 
   const handleTyping = () => {
-    if (!isBlocked) {
+    if (!isBlocked && !isBlockedByContact) {
       sendTypingWs(contact.id);
     }
   };
 
   const handleStopTyping = () => {
-    if (!isBlocked) {
+    if (!isBlocked && !isBlockedByContact) {
       sendStoppedTypingWs(contact.id);
     }
   };
@@ -78,6 +85,7 @@ export const ChatArea: React.FC<ChatAreaProps> = ({
         isOnline={isOnline}
         lastSeen={lastSeen}
         isBlocked={isBlocked}
+        isBlockedBy={isBlockedByContact}
         onBackMobile={onBackMobile}
         onBlockToggle={onBlockToggle}
         onViewProfile={onViewProfile}

@@ -14,12 +14,14 @@ import {
   IncomingWebSocketPayload,
   OutgoingWebSocketPayload,
 } from "@/types/websocket.types";
+import { messageService } from "@/services/message.service";
 
 type WebSocketEventHandler = (payload: IncomingWebSocketPayload) => void;
 
 export interface PresenceInfo {
   status: "online" | "offline";
   lastSeen?: string | null;
+  isBlockedBy?: boolean;
 }
 
 interface WebSocketContextType {
@@ -27,6 +29,9 @@ interface WebSocketContextType {
   presenceMap: Record<string, PresenceInfo>;
   typingMap: Record<string, boolean>;
   unreadTotal: number;
+  unreadCountsByContact: Record<string, number>;
+  unreadSendersCount: number;
+  clearUnreadForContact: (contactId: string) => void;
   setUnreadTotal: React.Dispatch<React.SetStateAction<number>>;
   sendMessageWs: (receiverId: string, content: string) => boolean;
   sendTypingWs: (receiverId: string) => boolean;
@@ -35,6 +40,7 @@ interface WebSocketContextType {
   sendEditWs: (messageId: string, content: string) => boolean;
   sendDeleteForMeWs: (messageId: string) => boolean;
   sendDeleteForEveryoneWs: (messageId: string) => boolean;
+  sendReadConversationWs: (contactId: string) => boolean;
   subscribe: (handler: WebSocketEventHandler) => () => void;
 }
 
@@ -55,6 +61,23 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({
   >({});
   const [typingMap, setTypingMap] = useState<Record<string, boolean>>({});
   const [unreadTotal, setUnreadTotal] = useState<number>(0);
+  const [unreadCountsByContact, setUnreadCountsByContact] = useState<
+    Record<string, number>
+  >({});
+
+  const unreadSendersCount = Object.values(unreadCountsByContact).filter(
+    (count) => count > 0
+  ).length;
+
+  const clearUnreadForContact = useCallback((contactId: string) => {
+    setUnreadCountsByContact((prev) => {
+      if (!prev[contactId]) return prev;
+      return {
+        ...prev,
+        [contactId]: 0,
+      };
+    });
+  }, []);
 
   const socketRef = useRef<WebSocket | null>(null);
   const reconnectTimeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -132,6 +155,13 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({
     [sendPayload]
   );
 
+  const sendReadConversationWs = useCallback(
+    (contactId: string) => {
+      return sendPayload({ type: "read_conversation", contactId });
+    },
+    [sendPayload]
+  );
+
   const connect = useCallback(() => {
     if (!token || !user) return;
     if (
@@ -166,13 +196,31 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({
                   payload.lastSeen !== undefined
                     ? payload.lastSeen
                     : prev[payload.userId]?.lastSeen,
+                isBlockedBy:
+                  payload.isBlockedBy !== undefined
+                    ? payload.isBlockedBy
+                    : prev[payload.userId]?.isBlockedBy,
               },
             }));
           }
 
-          // Unread count update from server on connection
+          // Unread count update from server
           if (payload.type === "unread_count") {
-            setUnreadTotal(payload.data.totalUnread);
+            setUnreadTotal(Math.max(0, payload.data.totalUnread));
+            if (payload.data.unreadBySender) {
+              setUnreadCountsByContact(payload.data.unreadBySender);
+            }
+          }
+
+          // Real-time incoming message counter per sender
+          if (payload.type === "message") {
+            const msg = payload.data;
+            if (msg.receiverId === user?.id) {
+              setUnreadCountsByContact((prev) => ({
+                ...prev,
+                [msg.senderId]: (prev[msg.senderId] || 0) + 1,
+              }));
+            }
           }
 
           // Typing indicators
@@ -245,6 +293,18 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({
   useEffect(() => {
     if (token && user) {
       connect();
+      // Fetch initial unread counts grouped by sender
+      messageService
+        .getUnreadSummary()
+        .then((res) => {
+          if (res?.data) {
+            setUnreadCountsByContact(res.data.unreadBySender || {});
+            setUnreadTotal(res.data.totalUnread || 0);
+          }
+        })
+        .catch((err) => {
+          console.warn("Could not fetch unread summary:", err);
+        });
     } else {
       if (socketRef.current) {
         socketRef.current.close(1000, "User logged out");
@@ -253,6 +313,8 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({
       setIsConnected(false);
       setPresenceMap({});
       setTypingMap({});
+      setUnreadCountsByContact({});
+      setUnreadTotal(0);
     }
 
     return () => {
@@ -273,6 +335,9 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({
         presenceMap,
         typingMap,
         unreadTotal,
+        unreadCountsByContact,
+        unreadSendersCount,
+        clearUnreadForContact,
         setUnreadTotal,
         sendMessageWs,
         sendTypingWs,
@@ -281,6 +346,7 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({
         sendEditWs,
         sendDeleteForMeWs,
         sendDeleteForEveryoneWs,
+        sendReadConversationWs,
         subscribe,
       }}
     >

@@ -30,6 +30,10 @@ export type OutgoingWebSocketPayload =
   | {
       type: "delete_for_everyone";
       messageId: string;
+    }
+  | {
+      type: "read_conversation";
+      contactId: string;
     };
 
 export type IncomingWebSocketPayload =
@@ -41,6 +45,8 @@ export type IncomingWebSocketPayload =
       type: "unread_count";
       data: {
         totalUnread: number;
+        unreadBySender?: Record<string, number>;
+        unreadSendersCount?: number;
       };
     }
   | {
@@ -48,6 +54,7 @@ export type IncomingWebSocketPayload =
       userId: string;
       status: "online" | "offline";
       lastSeen?: string | null;
+      isBlockedBy?: boolean;
     }
   | {
       type: "message";
