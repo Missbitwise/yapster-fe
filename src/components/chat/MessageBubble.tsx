@@ -28,7 +28,6 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
-  // Close menu on click outside
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
@@ -43,7 +42,6 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({
     };
   }, [menuOpen]);
 
-  // Check if message is within 5 minutes for editing
   const messageTime = new Date(message.createdAt).getTime();
   const isEditable = isMe && Date.now() - messageTime <= 5 * 60 * 1000;
 
@@ -59,7 +57,7 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({
         isMe ? "justify-end" : "justify-start"
       }`}
     >
-      {/* Left Avatar for other user */}
+
       {!isMe && (
         <Avatar
           src={senderAvatar}
@@ -69,7 +67,7 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({
         />
       )}
 
-      {/* Bubble container */}
+
       <div
         className={`relative max-w-[78%] sm:max-w-[65%] rounded-2xl px-4 py-2.5 shadow-md transition-all ${
           isMe
@@ -77,7 +75,7 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({
             : "bg-surface-100 text-slate-100 border border-card-border/60 rounded-bl-sm"
         }`}
       >
-        {/* Message Content */}
+
         {isMedia ? (
           <div className="my-1 overflow-hidden rounded-xl bg-black/20">
             <img
@@ -93,7 +91,7 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({
           </p>
         )}
 
-        {/* Footer info: time, edited tag, status ticks */}
+
         <div
           className={`flex items-center gap-1.5 mt-1 text-[10px] select-none ${
             isMe ? "text-purple-200/90 justify-end" : "text-slate-400 justify-start"
@@ -119,7 +117,7 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({
           )}
         </div>
 
-        {/* Dropdown Action Trigger */}
+
         <button
           onClick={() => setMenuOpen(!menuOpen)}
           className={`absolute top-1.5 opacity-0 group-hover:opacity-100 p-1 rounded-full hover:bg-black/20 text-slate-200 transition-opacity ${
@@ -130,7 +128,7 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({
           <MoreVertical className="w-4 h-4" />
         </button>
 
-        {/* Context Menu */}
+
         {menuOpen && (
           <div
             ref={menuRef}
