@@ -36,7 +36,6 @@ export const MessageList: React.FC<MessageListProps> = ({
   const previousScrollHeightRef = useRef<number>(0);
   const isInitialLoadRef = useRef<boolean>(true);
 
-  // Group messages by date
   const formatDateHeader = (dateStr: string) => {
     const d = new Date(dateStr);
     const today = new Date();
@@ -56,7 +55,6 @@ export const MessageList: React.FC<MessageListProps> = ({
     });
   };
 
-  // Scroll to bottom on initial load
   useEffect(() => {
     if (messages.length > 0 && isInitialLoadRef.current && containerRef.current) {
       containerRef.current.scrollTop = containerRef.current.scrollHeight;
@@ -64,7 +62,6 @@ export const MessageList: React.FC<MessageListProps> = ({
     }
   }, [messages]);
 
-  // Adjust scroll position after prepending older messages
   useEffect(() => {
     if (containerRef.current && previousScrollHeightRef.current > 0) {
       const heightDifference =
@@ -82,7 +79,6 @@ export const MessageList: React.FC<MessageListProps> = ({
     }
   };
 
-  // Auto-scroll to bottom if message was appended (e.g. by me or while near bottom)
   useEffect(() => {
     const el = containerRef.current;
     if (!el) return;
@@ -100,7 +96,7 @@ export const MessageList: React.FC<MessageListProps> = ({
       onScroll={handleScroll}
       className="flex-1 overflow-y-auto px-1 sm:px-3 py-4 space-y-1"
     >
-      {/* Loading older messages spinner */}
+
       {isLoadingOlder && (
         <div className="flex justify-center py-2">
           <div className="flex items-center gap-2 px-3 py-1 bg-surface-100 rounded-full text-xs text-brand-light border border-card-border">
@@ -110,7 +106,7 @@ export const MessageList: React.FC<MessageListProps> = ({
         </div>
       )}
 
-      {/* Initial loading state */}
+
       {isLoading && messages.length === 0 && (
         <div className="flex flex-col items-center justify-center h-full py-16 text-slate-400">
           <Loader2 className="w-8 h-8 animate-spin text-brand mb-2" />
@@ -118,7 +114,7 @@ export const MessageList: React.FC<MessageListProps> = ({
         </div>
       )}
 
-      {/* Empty messages state */}
+
       {!isLoading && messages.length === 0 && (
         <div className="flex flex-col items-center justify-center h-full py-20 text-center px-4">
           <div className="w-16 h-16 rounded-full bg-surface-100 border border-card-border flex items-center justify-center text-brand-light mb-3 shadow-glow-sm">
@@ -133,7 +129,7 @@ export const MessageList: React.FC<MessageListProps> = ({
         </div>
       )}
 
-      {/* Render messages with Date group separators */}
+
       {messages.map((message, index) => {
         const currentDateHeader = formatDateHeader(message.createdAt);
         const prevMessage = index > 0 ? messages[index - 1] : null;
