@@ -139,7 +139,6 @@ export const EmojiGifPicker: React.FC<EmojiGifPickerProps> = ({
   const [search, setSearch] = useState("");
   const pickerRef = useRef<HTMLDivElement>(null);
 
-  // Close on Escape or click outside
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       if (pickerRef.current && !pickerRef.current.contains(e.target as Node)) {
@@ -186,7 +185,7 @@ export const EmojiGifPicker: React.FC<EmojiGifPickerProps> = ({
       ref={pickerRef}
       className="absolute bottom-full mb-3 left-4 sm:left-6 z-40 w-[320px] sm:w-[360px] h-[380px] bg-card/95 backdrop-blur-xl border border-card-border rounded-3xl shadow-2xl flex flex-col overflow-hidden animate-in fade-in slide-in-from-bottom-2 duration-150"
     >
-      {/* Top Header & Tabs */}
+
       <div className="p-3 border-b border-card-border/70 flex items-center justify-between gap-2 bg-surface-200/50">
         <div className="flex items-center gap-1 bg-surface-100 p-1 rounded-2xl border border-card-border/60">
           <button
@@ -226,7 +225,7 @@ export const EmojiGifPicker: React.FC<EmojiGifPickerProps> = ({
         </button>
       </div>
 
-      {/* Search Bar */}
+
       <div className="p-2.5 pb-1.5">
         <div className="relative">
           <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
@@ -242,7 +241,7 @@ export const EmojiGifPicker: React.FC<EmojiGifPickerProps> = ({
         </div>
       </div>
 
-      {/* Emoji Category Bar (if emojis tab and not searching) */}
+
       {activeTab === "emojis" && !search.trim() && (
         <div className="flex items-center gap-1 px-3 py-1 border-b border-card-border/40 overflow-x-auto scrollbar-none text-xs">
           {EMOJI_CATEGORIES.map((cat) => (
@@ -263,7 +262,7 @@ export const EmojiGifPicker: React.FC<EmojiGifPickerProps> = ({
         </div>
       )}
 
-      {/* Content Area */}
+
       <div className="flex-1 overflow-y-auto p-3">
         {activeTab === "emojis" ? (
           <div className="grid grid-cols-7 sm:grid-cols-8 gap-2">
@@ -304,7 +303,7 @@ export const EmojiGifPicker: React.FC<EmojiGifPickerProps> = ({
         )}
       </div>
 
-      {/* Footer Hint */}
+
       <div className="p-2 border-t border-card-border/50 text-[10px] text-center text-slate-400 bg-surface-200/30">
         {activeTab === "emojis"
           ? "Click an emoji to insert into message"
