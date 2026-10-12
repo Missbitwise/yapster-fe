@@ -50,11 +50,11 @@ export default function RegisterPage() {
 
   return (
     <div className="min-h-screen bg-background flex flex-col justify-center items-center px-4 py-12 relative overflow-hidden">
-      {/* Ambient background glows */}
+
       <div className="absolute top-1/4 -right-20 w-80 h-80 bg-brand/20 rounded-full blur-[120px] pointer-events-none" />
       <div className="absolute bottom-1/4 -left-20 w-80 h-80 bg-purple-600/15 rounded-full blur-[120px] pointer-events-none" />
 
-      {/* Card */}
+
       <div className="relative w-full max-w-md bg-card/90 border border-card-border/80 rounded-3xl p-8 shadow-2xl backdrop-blur-xl">
         <div className="flex flex-col items-center text-center mb-6">
           <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-brand-dark via-brand to-purple-400 p-0.5 shadow-glow mb-4">
