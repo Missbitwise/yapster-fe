@@ -54,12 +54,10 @@ export default function ChatDashboardPage() {
   const [isLocationModalOpen, setIsLocationModalOpen] = useState(false);
   const [userToBlock, setUserToBlock] = useState<{ id: string; name: string } | null>(null);
 
-  // Check if location prompt should appear automatically on first entry
   useEffect(() => {
     if (typeof window !== "undefined") {
       const hasPrompted = localStorage.getItem("yapster_location_prompted");
       if (!hasPrompted && !hasLocation) {
-        // Automatically prompt after 1.5 seconds so UI settles
         const timer = setTimeout(() => {
           setIsLocationModalOpen(true);
           localStorage.setItem("yapster_location_prompted", "true");
@@ -69,7 +67,6 @@ export default function ChatDashboardPage() {
     }
   }, [hasLocation]);
 
-  // Auto-select first friend if on desktop and none selected
   useEffect(() => {
     if (friends.length > 0 && !activeContact && typeof window !== "undefined") {
       if (window.innerWidth >= 768) {
@@ -78,7 +75,6 @@ export default function ChatDashboardPage() {
     }
   }, [friends, activeContact]);
 
-  // Real-time Ephemeral notifications for messages and friend requests
   useEffect(() => {
     const unsubscribe = subscribe((payload) => {
       if (payload.type === "message") {
@@ -142,7 +138,6 @@ export default function ChatDashboardPage() {
   return (
     <ProtectedRoute>
       <div className="flex h-screen w-screen overflow-hidden bg-background">
-        {/* Leftmost Sidebar Icon Navigation */}
         <SidebarNav
           currentTab={currentTab}
           onSelectTab={handleTabSelect}
@@ -151,16 +146,13 @@ export default function ChatDashboardPage() {
           onOpenProfile={() => setIsProfileOpen(true)}
         />
 
-        {/* Tab Specific Content Area */}
         {currentTab === "chats" && (
           <div className="flex-1 flex overflow-hidden">
-            {/* Middle Conversations Column (hidden on mobile when a chat is open) */}
             <div
               className={`w-full md:w-80 lg:w-96 shrink-0 h-full flex flex-col ${
                 activeContact ? "hidden md:flex" : "flex"
               }`}
             >
-              {/* Location Pill Bar at top of conversations list */}
               <div className="px-4 pt-3 pb-1 bg-surface-300">
                 <button
                   onClick={() => setIsLocationModalOpen(true)}
@@ -192,7 +184,6 @@ export default function ChatDashboardPage() {
               </div>
             </div>
 
-            {/* Right Active Chat Area */}
             <div
               className={`flex-1 h-full ${
                 !activeContact ? "hidden md:flex" : "flex"
@@ -234,7 +225,7 @@ export default function ChatDashboardPage() {
           </div>
         )}
 
-        {/* Nearby Radar Tab */}
+
         {currentTab === "nearby" && (
           <div className="flex-1 h-full overflow-hidden">
             <NearbyRadar
@@ -249,7 +240,7 @@ export default function ChatDashboardPage() {
           </div>
         )}
 
-        {/* All Friends Directory Tab */}
+
         {currentTab === "friends" && (
           <div className="flex-1 h-full overflow-hidden">
             <FriendsTab
@@ -262,7 +253,7 @@ export default function ChatDashboardPage() {
           </div>
         )}
 
-        {/* Upfront Automatic Location Prompt Modal */}
+
         <LocationPromptModal
           isOpen={isLocationModalOpen}
           onClose={() => setIsLocationModalOpen(false)}
@@ -276,7 +267,7 @@ export default function ChatDashboardPage() {
           }}
         />
 
-        {/* Modals */}
+
         <FriendRequestsModal
           isOpen={isRequestsModalOpen}
           onClose={() => setIsRequestsModalOpen(false)}
@@ -319,16 +310,23 @@ export default function ChatDashboardPage() {
           isOnline={
             contactProfileToView
               ? Boolean(
-                  !contactProfileToView.is_blocked_by &&
-                    !presenceMap[contactProfileToView.id]?.isBlockedBy &&
+                  !isBlocked(contactProfileToView.id) &&
+                    !contactProfileToView.is_blocked &&
+                    !(presenceMap[contactProfileToView.id]?.isHidden ??
+                      (contactProfileToView.is_blocked_by ||
+                        presenceMap[contactProfileToView.id]?.isBlockedBy)) &&
                     presenceMap[contactProfileToView.id]?.status === "online"
                 )
               : false
           }
           lastSeen={
             contactProfileToView
-              ? contactProfileToView.is_blocked_by ||
-                presenceMap[contactProfileToView.id]?.isBlockedBy
+              ? isBlocked(contactProfileToView.id) ||
+                contactProfileToView.is_blocked ||
+                (presenceMap[contactProfileToView.id]?.isHidden !== undefined
+                  ? presenceMap[contactProfileToView.id]?.isHidden
+                  : contactProfileToView.is_blocked_by ||
+                    presenceMap[contactProfileToView.id]?.isBlockedBy)
                 ? null
                 : (presenceMap[contactProfileToView.id]?.lastSeen ??
                   contactProfileToView.last_seen)
@@ -340,8 +338,12 @@ export default function ChatDashboardPage() {
           isBlockedBy={
             contactProfileToView
               ? Boolean(
-                  contactProfileToView.is_blocked_by ||
-                    presenceMap[contactProfileToView.id]?.isBlockedBy
+                  isBlocked(contactProfileToView.id) ||
+                    contactProfileToView.is_blocked ||
+                    (presenceMap[contactProfileToView.id]?.isHidden !== undefined
+                      ? presenceMap[contactProfileToView.id]?.isHidden
+                      : contactProfileToView.is_blocked_by ||
+                        presenceMap[contactProfileToView.id]?.isBlockedBy)
                 )
               : false
           }
