@@ -94,7 +94,7 @@ export const MessageInput: React.FC<MessageInputProps> = ({
 
   return (
     <div className="relative p-3 sm:p-4 bg-surface-200/90 border-t border-card-border/60 backdrop-blur-md">
-      {/* Emoji & GIF Popover Picker */}
+
       <EmojiGifPicker
         isOpen={isPickerOpen}
         onClose={() => setIsPickerOpen(false)}
@@ -106,7 +106,7 @@ export const MessageInput: React.FC<MessageInputProps> = ({
         onSubmit={handleSubmit}
         className="flex items-center gap-2.5 bg-surface-100 border border-card-border/80 rounded-full px-3.5 py-1.5 shadow-inner transition-colors focus-within:border-brand/70"
       >
-        {/* Emoji & GIF Toggle Button */}
+
         <button
           type="button"
           disabled={disabled}
@@ -121,7 +121,7 @@ export const MessageInput: React.FC<MessageInputProps> = ({
           <Smile className="w-5 h-5" />
         </button>
 
-        {/* Text Input */}
+
         <input
           ref={inputRef}
           type="text"
@@ -140,7 +140,7 @@ export const MessageInput: React.FC<MessageInputProps> = ({
           className="flex-1 bg-transparent text-sm text-slate-100 placeholder-slate-400 focus:outline-none py-1.5"
         />
 
-        {/* Send Button matching reference purple paper airplane */}
+
         <button
           type="submit"
           disabled={disabled || !content.trim()}
