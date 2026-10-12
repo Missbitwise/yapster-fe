@@ -51,32 +51,43 @@ export const ChatArea: React.FC<ChatAreaProps> = ({
   const [editingMessage, setEditingMessage] = useState<Message | null>(null);
 
   const presence = presenceMap[contact.id];
-  const isBlockedByContact = Boolean(
-    contact.is_blocked_by || presence?.isBlockedBy
+  const isPresenceHidden = Boolean(
+    isBlocked ||
+      (presence?.isHidden !== undefined
+        ? presence.isHidden
+        : contact.is_blocked || contact.is_blocked_by || presence?.isBlockedBy)
   );
-  const isOnline = isBlockedByContact ? false : presence?.status === "online";
-  const lastSeen = isBlockedByContact
+  console.debug("[presence:chat-view] effective state", {
+    contactId: contact.id,
+    iBlockedContact: isBlocked,
+    contactBlockedMe: isPresenceHidden,
+    socketStatus: presence?.status ?? null,
+    socketLastSeen: presence?.lastSeen ?? null,
+    contactLastSeen: contact.last_seen ?? null,
+  });
+  const isOnline = isPresenceHidden ? false : presence?.status === "online";
+  const lastSeen = isPresenceHidden
     ? null
     : presence?.lastSeen !== undefined
     ? presence.lastSeen
     : contact.last_seen;
-  const isTyping = isBlockedByContact ? false : !!typingMap[contact.id];
+  const isTyping = isPresenceHidden ? false : !!typingMap[contact.id];
 
   const handleTyping = () => {
-    if (!isBlocked && !isBlockedByContact) {
+    if (!isPresenceHidden) {
       sendTypingWs(contact.id);
     }
   };
 
   const handleStopTyping = () => {
-    if (!isBlocked && !isBlockedByContact) {
+    if (!isPresenceHidden) {
       sendStoppedTypingWs(contact.id);
     }
   };
 
   return (
     <div className="flex flex-col h-full bg-background relative overflow-hidden">
-      {/* Top Header */}
+
       <ChatHeader
         contactName={contact.name}
         contactUsername={contact.username}
@@ -85,13 +96,14 @@ export const ChatArea: React.FC<ChatAreaProps> = ({
         isOnline={isOnline}
         lastSeen={lastSeen}
         isBlocked={isBlocked}
-        isBlockedBy={isBlockedByContact}
+        isBlockedBy={isPresenceHidden}
+        hidePresence={isPresenceHidden}
         onBackMobile={onBackMobile}
         onBlockToggle={onBlockToggle}
         onViewProfile={onViewProfile}
       />
 
-      {/* Blocked Alert Banner if contact is blocked */}
+
       {isBlocked && (
         <div className="bg-rose-950/60 border-b border-rose-800/40 px-4 py-2 flex items-center justify-between text-xs text-rose-300">
           <div className="flex items-center gap-2">
@@ -107,7 +119,7 @@ export const ChatArea: React.FC<ChatAreaProps> = ({
         </div>
       )}
 
-      {/* Messages Stream with cursor pagination */}
+
       <MessageList
         messages={messages}
         currentUserId={user?.id}
@@ -122,10 +134,10 @@ export const ChatArea: React.FC<ChatAreaProps> = ({
         onDeleteForEveryone={deleteForEveryone}
       />
 
-      {/* Real-time Typing Indicator */}
+
       {isTyping && !isBlocked && <TypingIndicator name={contact.name} />}
 
-      {/* Pill Message Input Bar */}
+
       <MessageInput
         onSendMessage={sendMessage}
         onTyping={handleTyping}
@@ -138,7 +150,7 @@ export const ChatArea: React.FC<ChatAreaProps> = ({
         }
       />
 
-      {/* Edit message modal */}
+
       <EditMessageModal
         isOpen={!!editingMessage}
         onClose={() => setEditingMessage(null)}
