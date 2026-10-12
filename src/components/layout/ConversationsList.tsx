@@ -184,7 +184,7 @@ export const ConversationsList: React.FC<ConversationsListProps> = ({
                       src={friend.profile_picture}
                       name={friend.name}
                       size="md"
-                      isOnline={blocked || isBlockedBy ? false : isOnline}
+                      isOnline={isBlockedBy ? false : isOnline}
                       ringColor={ring}
                     />
 
@@ -198,7 +198,9 @@ export const ConversationsList: React.FC<ConversationsListProps> = ({
                             <span className="text-[10px] text-rose-400 font-semibold bg-rose-500/10 px-1.5 py-0.5 rounded border border-rose-500/20">
                               Blocked
                             </span>
-                          ) : isBlockedBy ? null : isOnline ? (
+                          ) : isBlockedBy ? (
+                            <span className="text-slate-400 font-medium">Offline</span>
+                          ) : isOnline ? (
                             <span className="text-emerald-400 font-medium">Online</span>
                           ) : (
                             formatLastSeenCompact(lastSeen)

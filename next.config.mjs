@@ -1,4 +1,6 @@
-/** @type {import('next').NextConfig} */
+const backendUrl =
+  process.env.BACKEND_URL || "https://yapster-be.onrender.com";
+
 const nextConfig = {
   reactStrictMode: true,
   images: {
@@ -8,7 +10,7 @@ const nextConfig = {
     return [
       {
         source: "/api/:path*",
-        destination: "https://yapster-be.onrender.com/api/:path*",
+        destination: `${backendUrl}/api/:path*`,
       },
     ];
   },
