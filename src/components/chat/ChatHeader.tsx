@@ -20,6 +20,7 @@ interface ChatHeaderProps {
   lastSeen?: string | null;
   isBlocked?: boolean;
   isBlockedBy?: boolean;
+  hidePresence?: boolean;
   onBackMobile?: () => void;
   onBlockToggle?: () => void;
   onViewProfile?: () => void;
@@ -34,6 +35,7 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({
   lastSeen,
   isBlocked = false,
   isBlockedBy = false,
+  hidePresence = false,
   onBackMobile,
   onBlockToggle,
   onViewProfile,
@@ -59,7 +61,7 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({
 
   return (
     <div className="flex items-center justify-between px-4 py-3 bg-surface-200/95 border-b border-card-border/70 backdrop-blur-md z-20">
-      {/* Contact Info and Avatar */}
+
       <div className="flex items-center gap-3 min-w-0">
         {onBackMobile && (
           <button
@@ -76,7 +78,7 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({
             src={contactAvatar}
             name={contactName}
             size="md"
-            isOnline={effectiveOnline}
+            isOnline={hidePresence ? undefined : effectiveOnline}
             ringColor="cyan"
           />
         </div>
@@ -94,9 +96,7 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({
           </div>
 
           <div className="flex items-center gap-1.5 mt-0.5">
-            {isBlockedBy ? (
-              <span className="text-xs text-slate-400">Offline</span>
-            ) : effectiveOnline ? (
+            {hidePresence ? null : effectiveOnline ? (
               <span className="text-xs font-medium text-emerald-400 flex items-center gap-1">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
                 Online
@@ -115,9 +115,9 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({
         </div>
       </div>
 
-      {/* Header Actions */}
+
       <div className="flex items-center gap-1 sm:gap-2 text-slate-400">
-        {/* Options Menu */}
+
         <div className="relative" ref={menuRef}>
           <button
             onClick={() => setMenuOpen(!menuOpen)}
