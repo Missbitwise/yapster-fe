@@ -37,7 +37,6 @@ export const Avatar: React.FC<AvatarProps> = ({
 }) => {
   const [imgError, setImgError] = useState(false);
 
-  // Generate deterministic avatar URL if no valid image is provided
   const fallbackUrl = `https://api.dicebear.com/7.x/bottts-neutral/svg?seed=${encodeURIComponent(
     name
   )}&backgroundColor=1f2132`;
