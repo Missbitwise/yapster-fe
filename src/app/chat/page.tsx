@@ -156,7 +156,7 @@ export default function ChatDashboardPage() {
               <div className="px-4 pt-3 pb-1 bg-surface-300">
                 <button
                   onClick={() => setIsLocationModalOpen(true)}
-                  className="w-full flex items-center justify-between px-3 py-1.5 rounded-full bg-surface-100 hover:bg-surface-50 border border-card-border hover:border-brand/40 text-[11px] text-slate-300 transition-colors"
+                  className="w-full flex items-center justify-between px-3 py-1.5 rounded-full bg-surface-100  border border-card-border  text-[11px] text-slate-300 transition-colors"
                   title="Click to update your location"
                 >
                   <div className="flex items-center gap-1.5 truncate">
@@ -202,7 +202,7 @@ export default function ChatDashboardPage() {
                 </div>
               ) : (
                 <div className="flex-1 hidden md:flex flex-col items-center justify-center bg-surface-300 text-slate-400 p-8 text-center select-none">
-                  <div className="w-20 h-20 rounded-3xl bg-surface-100 border border-card-border flex items-center justify-center text-brand mb-4 shadow-glow">
+                  <div className="w-20 h-20 rounded-3xl bg-surface-100 border border-card-border flex items-center justify-center text-brand mb-4 ">
                     <MessageSquare className="w-10 h-10" />
                   </div>
                   <h3 className="text-lg font-bold text-white mb-2">
@@ -214,7 +214,7 @@ export default function ChatDashboardPage() {
                   </p>
                   <button
                     onClick={() => setCurrentTab("nearby")}
-                    className="flex items-center gap-2 px-5 py-2.5 rounded-2xl bg-brand hover:bg-brand-dark text-white text-xs font-semibold shadow-glow transition-all"
+                    className="flex items-center gap-2 px-5 py-2.5 rounded-2xl bg-brand  text-white text-xs font-semibold  transition-all"
                   >
                     <Compass className="w-4 h-4" />
                     <span>Find Nearby Friends</span>

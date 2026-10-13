@@ -66,7 +66,7 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({
         {onBackMobile && (
           <button
             onClick={onBackMobile}
-            className="md:hidden p-1.5 -ml-1 text-slate-400 hover:text-white rounded-full hover:bg-surface-100 transition-colors"
+            className="md:hidden p-1.5 -ml-1 text-slate-400  rounded-full  transition-colors"
             title="Back to chats"
           >
             <ArrowLeft className="w-5 h-5" />
@@ -121,7 +121,7 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({
         <div className="relative" ref={menuRef}>
           <button
             onClick={() => setMenuOpen(!menuOpen)}
-            className="p-2 hover:text-white hover:bg-surface-100 rounded-full transition-colors"
+            className="p-2   rounded-full transition-colors"
             title="More actions"
           >
             <MoreVertical className="w-5 h-5" />
@@ -135,7 +135,7 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({
                     setMenuOpen(false);
                     onViewProfile();
                   }}
-                  className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-slate-200 hover:text-white hover:bg-surface-100 transition-colors"
+                  className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-slate-200   transition-colors"
                 >
                   <UserIcon className="w-4 h-4 text-brand-light" />
                   <span>View Profile</span>
@@ -150,8 +150,8 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({
                   }}
                   className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-xl transition-colors ${
                     isBlocked
-                      ? "text-emerald-400 hover:bg-emerald-500/10"
-                      : "text-rose-400 hover:bg-rose-500/10"
+                      ? "text-emerald-400 "
+                      : "text-rose-400 "
                   }`}
                 >
                   {isBlocked ? (

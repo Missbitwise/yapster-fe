@@ -112,7 +112,7 @@ export const ChatArea: React.FC<ChatAreaProps> = ({
           </div>
           <button
             onClick={onBlockToggle}
-            className="underline hover:text-white font-medium ml-2"
+            className="underline  font-medium ml-2"
           >
             Unblock
           </button>

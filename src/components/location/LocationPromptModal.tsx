@@ -108,7 +108,7 @@ export const LocationPromptModal: React.FC<LocationPromptModalProps> = ({
     >
       <div className="space-y-4 text-center">
 
-        <div className="mx-auto w-16 h-16 rounded-full bg-brand/20 border border-brand/40 flex items-center justify-center text-brand-light shadow-glow">
+        <div className="mx-auto w-16 h-16 rounded-full bg-brand/20 border border-brand/40 flex items-center justify-center text-brand-light ">
           <Navigation className="w-8 h-8 animate-pulse text-brand" />
         </div>
 
@@ -133,7 +133,7 @@ export const LocationPromptModal: React.FC<LocationPromptModalProps> = ({
             <button
               onClick={handleRequestLocation}
               disabled={isDetecting}
-              className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-2xl bg-brand hover:bg-brand-dark text-white text-xs font-semibold shadow-glow transition-all disabled:opacity-50"
+              className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-2xl bg-brand  text-white text-xs font-semibold  transition-all disabled:opacity-50"
             >
               {isDetecting ? (
                 <>
@@ -151,7 +151,7 @@ export const LocationPromptModal: React.FC<LocationPromptModalProps> = ({
             <button
               type="button"
               onClick={() => setShowManual(true)}
-              className="text-xs text-slate-400 hover:text-brand-light underline py-1 block mx-auto"
+              className="text-xs text-slate-400  underline py-1 block mx-auto"
             >
               Or enter your city manually
             </button>
@@ -159,7 +159,7 @@ export const LocationPromptModal: React.FC<LocationPromptModalProps> = ({
             <button
               type="button"
               onClick={onClose}
-              className="w-full py-2 text-xs text-slate-500 hover:text-slate-300 transition-colors"
+              className="w-full py-2 text-xs text-slate-500  transition-colors"
             >
               Maybe Later
             </button>
@@ -213,14 +213,14 @@ export const LocationPromptModal: React.FC<LocationPromptModalProps> = ({
               <button
                 type="button"
                 onClick={() => setShowManual(false)}
-                className="flex-1 py-2 rounded-xl bg-surface-100 text-xs font-semibold text-slate-300 hover:text-white"
+                className="flex-1 py-2 rounded-xl bg-surface-100 text-xs font-semibold text-slate-300 "
               >
                 Back
               </button>
               <button
                 type="submit"
                 disabled={isDetecting}
-                className="flex-1 py-2 rounded-xl bg-brand text-xs font-semibold text-white hover:bg-brand-dark shadow-glow-sm"
+                className="flex-1 py-2 rounded-xl bg-brand text-xs font-semibold text-white  "
               >
                 {isDetecting ? "Saving..." : "Save Location"}
               </button>

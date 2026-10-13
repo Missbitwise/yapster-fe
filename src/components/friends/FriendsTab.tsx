@@ -77,7 +77,7 @@ export const FriendsTab: React.FC<FriendsTabProps> = ({
           {onExploreNearby && (
             <button
               onClick={onExploreNearby}
-              className="flex items-center gap-2 px-4 py-2 rounded-2xl bg-brand text-white text-xs font-semibold hover:bg-brand-dark shadow-glow transition-all"
+              className="flex items-center gap-2 px-4 py-2 rounded-2xl bg-brand text-white text-xs font-semibold   transition-all"
             >
               <Compass className="w-4 h-4" />
               <span>Explore Nearby Users</span>
@@ -103,7 +103,7 @@ export const FriendsTab: React.FC<FriendsTabProps> = ({
             return (
               <div
                 key={friend.id}
-                className="bg-card border border-card-border hover:border-brand/40 rounded-3xl p-5 shadow-lg flex flex-col justify-between transition-all group"
+                className="bg-card border border-card-border  rounded-3xl p-5 shadow-lg flex flex-col justify-between transition-all group"
               >
                 <div>
                   <div className="flex items-center gap-3 mb-3">
@@ -115,7 +115,7 @@ export const FriendsTab: React.FC<FriendsTabProps> = ({
                       ringColor="purple"
                     />
                     <div className="min-w-0">
-                      <h4 className="text-base font-bold text-white group-hover:text-brand-light transition-colors truncate">
+                      <h4 className="text-base font-bold text-white  transition-colors truncate">
                         {friend.name}
                       </h4>
                       <p className="text-xs text-slate-400 truncate">
@@ -139,7 +139,7 @@ export const FriendsTab: React.FC<FriendsTabProps> = ({
                 <div className="flex items-center gap-2 mt-3 pt-3 border-t border-card-border/60">
                   <button
                     onClick={() => onOpenChat(friend)}
-                    className="flex-1 flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl bg-brand hover:bg-brand-dark text-white text-xs font-semibold shadow-glow-sm transition-all"
+                    className="flex-1 flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl bg-brand  text-white text-xs font-semibold  transition-all"
                   >
                     <MessageCircle className="w-3.5 h-3.5" />
                     <span>Send Message</span>
@@ -147,7 +147,7 @@ export const FriendsTab: React.FC<FriendsTabProps> = ({
 
                   <button
                     onClick={() => setUserToBlock(friend)}
-                    className="p-2 rounded-xl text-slate-500 hover:text-rose-400 hover:bg-rose-500/10 transition-colors"
+                    className="p-2 rounded-xl text-slate-500   transition-colors"
                     title="Block friend"
                   >
                     <ShieldAlert className="w-4 h-4" />

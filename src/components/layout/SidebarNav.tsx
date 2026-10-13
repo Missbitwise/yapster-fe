@@ -2,6 +2,7 @@
 
 import React from "react";
 import { Avatar } from "@/components/ui/Avatar";
+import { BrandLogo } from "@/components/ui/BrandLogo";
 import { useAuth } from "@/context/AuthContext";
 import {
   MessageSquare,
@@ -71,14 +72,10 @@ export const SidebarNav: React.FC<SidebarNavProps> = ({
       <div className="flex flex-col items-center gap-6">
         <div
           onClick={() => onSelectTab("chats")}
-          className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-brand-dark via-brand to-purple-400 p-0.5 shadow-glow cursor-pointer flex items-center justify-center transition-transform hover:scale-105"
+          className="w-11 h-11 cursor-pointer"
           title="Yapster"
         >
-          <div className="w-full h-full bg-surface-300 rounded-[14px] flex items-center justify-center">
-            <span className="font-extrabold text-lg text-transparent bg-clip-text bg-gradient-to-r from-brand-light to-purple-200">
-              Y
-            </span>
-          </div>
+          <BrandLogo className="h-full w-full" />
         </div>
 
 
@@ -93,8 +90,8 @@ export const SidebarNav: React.FC<SidebarNavProps> = ({
                 onClick={() => onSelectTab(item.id)}
                 className={`relative p-3 rounded-2xl transition-all group focus:outline-none ${
                   isActive
-                    ? "bg-brand text-white shadow-glow-sm"
-                    : "text-slate-400 hover:text-white hover:bg-surface-100"
+                    ? "bg-brand text-white "
+                    : "text-slate-400  "
                 }`}
                 title={item.label}
               >
@@ -115,7 +112,7 @@ export const SidebarNav: React.FC<SidebarNavProps> = ({
       <div className="flex flex-col items-center gap-3">
         <button
           onClick={onOpenProfile}
-          className="p-1 rounded-full hover:ring-2 hover:ring-brand transition-all focus:outline-none"
+          className="p-1 rounded-full   transition-all focus:outline-none"
           title="View profile"
         >
           <Avatar
@@ -128,7 +125,7 @@ export const SidebarNav: React.FC<SidebarNavProps> = ({
 
         <button
           onClick={logout}
-          className="p-2.5 rounded-2xl text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 transition-colors"
+          className="p-2.5 rounded-2xl text-slate-400   transition-colors"
           title="Sign out"
         >
           <LogOut className="w-5 h-5" />

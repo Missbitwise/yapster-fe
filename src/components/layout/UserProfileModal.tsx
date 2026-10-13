@@ -195,7 +195,7 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({
           <div className="w-full space-y-2 pt-2">
             <button
               onClick={() => setIsEditing(true)}
-              className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-2xl bg-brand hover:bg-brand-dark text-white text-xs font-semibold shadow-glow transition-all"
+              className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-2xl bg-brand  text-white text-xs font-semibold  transition-all"
             >
               <Edit3 className="w-4 h-4" />
               <span>Edit Profile</span>
@@ -206,7 +206,7 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({
                 onClose();
                 logout();
               }}
-              className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-2xl bg-rose-500/15 hover:bg-rose-500/25 text-rose-300 border border-rose-500/30 text-xs font-semibold transition-all"
+              className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-2xl bg-rose-500/15  text-rose-300 border border-rose-500/30 text-xs font-semibold transition-all"
             >
               <LogOut className="w-4 h-4" />
               <span>Sign Out of Yapster</span>
@@ -246,8 +246,8 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({
                     onClick={() => setSelectedAvatar(preset.url)}
                     className={`relative p-1 rounded-2xl transition-all focus:outline-none flex flex-col items-center group ${
                       isSelected
-                        ? "bg-brand/20 ring-2 ring-brand scale-105 shadow-glow-sm"
-                        : "hover:bg-surface-50 hover:scale-105"
+                        ? "bg-brand/20 ring-2 ring-brand  "
+                        : " "
                     }`}
                     title={preset.name}
                   >
@@ -258,7 +258,7 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({
                         className="w-full h-full object-cover"
                       />
                     </div>
-                    <span className="text-[9px] text-slate-400 mt-1 max-w-[48px] truncate group-hover:text-white">
+                    <span className="text-[9px] text-slate-400 mt-1 max-w-[48px] truncate ">
                       {preset.name}
                     </span>
                     {isSelected && (
@@ -357,14 +357,14 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({
             <button
               type="button"
               onClick={handleCancel}
-              className="flex-1 py-2.5 px-4 rounded-xl bg-surface-100 hover:bg-surface-50 text-slate-300 text-xs font-semibold transition-colors border border-card-border"
+              className="flex-1 py-2.5 px-4 rounded-xl bg-surface-100  text-slate-300 text-xs font-semibold transition-colors border border-card-border"
             >
               Cancel
             </button>
 
             <button
               type="submit"
-              className="flex-1 flex items-center justify-center gap-1.5 py-2.5 px-4 rounded-xl bg-brand hover:bg-brand-dark text-white text-xs font-semibold shadow-glow transition-all"
+              className="flex-1 flex items-center justify-center gap-1.5 py-2.5 px-4 rounded-xl bg-brand  text-white text-xs font-semibold  transition-all"
             >
               {saveSuccess ? (
                 <>

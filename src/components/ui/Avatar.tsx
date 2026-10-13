@@ -20,10 +20,10 @@ const sizeClasses = {
 };
 
 const ringColorClasses = {
-  purple: "ring-2 ring-purple-500/80 shadow-[0_0_10px_rgba(168,85,247,0.4)]",
-  yellow: "ring-2 ring-amber-400/80 shadow-[0_0_10px_rgba(251,191,36,0.4)]",
-  cyan: "ring-2 ring-cyan-400/80 shadow-[0_0_10px_rgba(34,211,238,0.4)]",
-  pink: "ring-2 ring-pink-500/80 shadow-[0_0_10px_rgba(236,72,153,0.4)]",
+  purple: "ring-2 ring-sky-500/70",
+  yellow: "ring-2 ring-amber-400/70",
+  cyan: "ring-2 ring-cyan-400/70",
+  pink: "ring-2 ring-rose-400/70",
   default: "",
 };
 
@@ -54,7 +54,7 @@ export const Avatar: React.FC<AvatarProps> = ({
   return (
     <div className={`relative inline-block shrink-0 ${className}`}>
       <div
-        className={`relative overflow-hidden rounded-full bg-surface-100 flex items-center justify-center font-semibold text-slate-200 transition-transform ${currentSizeClass} ${ringClass}`}
+        className={`relative overflow-hidden rounded-full bg-surface-100 flex items-center justify-center font-semibold text-slate-200 ${currentSizeClass} ${ringClass}`}
       >
         {src && !imgError ? (
           <img
@@ -85,7 +85,7 @@ export const Avatar: React.FC<AvatarProps> = ({
               : "w-4 h-4"
           } ${
             isOnline
-              ? "bg-emerald-500 shadow-[0_0_8px_#10b981]"
+              ? "bg-emerald-500"
               : "bg-slate-500"
           }`}
           title={isOnline ? "Online" : "Offline"}

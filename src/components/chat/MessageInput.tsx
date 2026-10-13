@@ -114,8 +114,8 @@ export const MessageInput: React.FC<MessageInputProps> = ({
           title="Emojis & GIFs"
           className={`p-2 rounded-full transition-colors ${
             isPickerOpen
-              ? "text-brand-light bg-brand/20 shadow-glow-sm"
-              : "text-slate-400 hover:text-brand-light hover:bg-surface-50"
+              ? "text-brand-light bg-brand/20 "
+              : "text-slate-400  "
           } disabled:opacity-40`}
         >
           <Smile className="w-5 h-5" />
@@ -146,7 +146,7 @@ export const MessageInput: React.FC<MessageInputProps> = ({
           disabled={disabled || !content.trim()}
           className={`p-2.5 rounded-full transition-all ${
             content.trim() && !disabled
-              ? "bg-brand text-white shadow-glow hover:bg-brand-dark scale-105 active:scale-95"
+              ? "bg-brand text-white    active:"
               : "bg-surface-50 text-slate-500 opacity-60 cursor-not-allowed"
           }`}
           title="Send message"

@@ -71,7 +71,7 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({
       <div
         className={`relative max-w-[78%] sm:max-w-[65%] rounded-2xl px-4 py-2.5 shadow-md transition-all ${
           isMe
-            ? "bg-gradient-to-r from-brand to-brand-vibrant text-white rounded-br-sm shadow-glow-sm"
+            ? "bg-gradient-to-r from-brand to-brand-vibrant text-white rounded-br-sm "
             : "bg-surface-100 text-slate-100 border border-card-border/60 rounded-bl-sm"
         }`}
       >
@@ -94,7 +94,7 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({
 
         <div
           className={`flex items-center gap-1.5 mt-1 text-[10px] select-none ${
-            isMe ? "text-purple-200/90 justify-end" : "text-slate-400 justify-start"
+            isMe ? "text-sky-200/90 justify-end" : "text-slate-400 justify-start"
           }`}
         >
           {message.editedAt && (
@@ -105,10 +105,10 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({
           {isMe && (
             <span className="inline-flex items-center ml-0.5" title={message.status}>
               {message.status === "sent" && (
-                <Check className="w-3.5 h-3.5 text-purple-200" />
+                <Check className="w-3.5 h-3.5 text-sky-200" />
               )}
               {message.status === "delivered" && (
-                <CheckCheck className="w-3.5 h-3.5 text-purple-200" />
+                <CheckCheck className="w-3.5 h-3.5 text-sky-200" />
               )}
               {message.status === "read" && (
                 <CheckCheck className="w-3.5 h-3.5 text-cyan-300 drop-shadow-[0_0_4px_rgba(34,211,238,0.8)]" />
@@ -120,7 +120,7 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({
 
         <button
           onClick={() => setMenuOpen(!menuOpen)}
-          className={`absolute top-1.5 opacity-0 group-hover:opacity-100 p-1 rounded-full hover:bg-black/20 text-slate-200 transition-opacity ${
+          className={`absolute top-1.5 opacity-0  p-1 rounded-full  text-slate-200 transition-opacity ${
             isMe ? "left-[-28px]" : "right-[-28px]"
           }`}
           title="Message options"
@@ -142,7 +142,7 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({
                   setMenuOpen(false);
                   onEdit(message);
                 }}
-                className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-slate-200 hover:text-white hover:bg-surface-100 transition-colors"
+                className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-slate-200   transition-colors"
               >
                 <Edit2 className="w-3.5 h-3.5 text-brand-light" />
                 <span>Edit message</span>
@@ -154,7 +154,7 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({
                 setMenuOpen(false);
                 onDeleteForMe(message._id);
               }}
-              className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-slate-200 hover:text-rose-300 hover:bg-rose-500/10 transition-colors"
+              className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-slate-200   transition-colors"
             >
               <Trash2 className="w-3.5 h-3.5 text-slate-400" />
               <span>Delete for me</span>
@@ -166,7 +166,7 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({
                   setMenuOpen(false);
                   onDeleteForEveryone(message._id);
                 }}
-                className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-rose-300 hover:text-rose-200 hover:bg-rose-500/20 transition-colors"
+                className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-rose-300   transition-colors"
               >
                 <Trash2 className="w-3.5 h-3.5 text-rose-400" />
                 <span>Delete for everyone</span>

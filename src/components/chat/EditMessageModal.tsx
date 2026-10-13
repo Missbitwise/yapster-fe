@@ -76,14 +76,14 @@ export const EditMessageModal: React.FC<EditMessageModalProps> = ({
           <button
             type="button"
             onClick={onClose}
-            className="px-4 py-2 text-xs font-semibold text-slate-300 hover:text-white bg-surface-100 hover:bg-surface-50 rounded-xl transition-colors"
+            className="px-4 py-2 text-xs font-semibold text-slate-300  bg-surface-100  rounded-xl transition-colors"
           >
             Cancel
           </button>
           <button
             type="submit"
             disabled={isSubmitting || !content.trim()}
-            className="px-4 py-2 text-xs font-semibold text-white bg-brand hover:bg-brand-dark rounded-xl shadow-glow-sm disabled:opacity-50 transition-all"
+            className="px-4 py-2 text-xs font-semibold text-white bg-brand  rounded-xl  disabled:opacity-50 transition-all"
           >
             {isSubmitting ? "Saving..." : "Save Changes"}
           </button>

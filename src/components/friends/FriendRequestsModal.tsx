@@ -61,8 +61,8 @@ export const FriendRequestsModal: React.FC<FriendRequestsModalProps> = ({
           onClick={() => setActiveTab("received")}
           className={`flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-xl text-xs font-semibold transition-all ${
             activeTab === "received"
-              ? "bg-brand text-white shadow-glow-sm"
-              : "text-slate-400 hover:text-white"
+              ? "bg-brand text-white "
+              : "text-slate-400 "
           }`}
         >
           <Inbox className="w-3.5 h-3.5" />
@@ -85,8 +85,8 @@ export const FriendRequestsModal: React.FC<FriendRequestsModalProps> = ({
           onClick={() => setActiveTab("sent")}
           className={`flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-xl text-xs font-semibold transition-all ${
             activeTab === "sent"
-              ? "bg-brand text-white shadow-glow-sm"
-              : "text-slate-400 hover:text-white"
+              ? "bg-brand text-white "
+              : "text-slate-400 "
           }`}
         >
           <Send className="w-3.5 h-3.5" />
@@ -151,7 +151,7 @@ export const FriendRequestsModal: React.FC<FriendRequestsModalProps> = ({
                   <button
                     onClick={() => handleAction(req.id, "accept")}
                     disabled={processingId === req.id}
-                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-brand hover:bg-brand-dark text-white text-xs font-semibold shadow-glow-sm transition-all disabled:opacity-50"
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-brand  text-white text-xs font-semibold  transition-all disabled:opacity-50"
                     title="Accept request"
                   >
                     {processingId === req.id ? (
@@ -165,7 +165,7 @@ export const FriendRequestsModal: React.FC<FriendRequestsModalProps> = ({
                   <button
                     onClick={() => handleAction(req.id, "reject")}
                     disabled={processingId === req.id}
-                    className="p-1.5 rounded-xl bg-surface-50 hover:bg-rose-500/20 text-slate-400 hover:text-rose-400 border border-card-border transition-colors disabled:opacity-50"
+                    className="p-1.5 rounded-xl bg-surface-50  text-slate-400  border border-card-border transition-colors disabled:opacity-50"
                     title="Decline request"
                   >
                     <X className="w-4 h-4" />
@@ -216,7 +216,7 @@ export const FriendRequestsModal: React.FC<FriendRequestsModalProps> = ({
                   <button
                     onClick={() => handleCancel(req.id)}
                     disabled={cancelingId === req.id}
-                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-300 border border-rose-500/30 text-xs font-semibold transition-all disabled:opacity-50"
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-rose-500/10  text-rose-300 border border-rose-500/30 text-xs font-semibold transition-all disabled:opacity-50"
                     title="Cancel this friend request"
                   >
                     {cancelingId === req.id ? (

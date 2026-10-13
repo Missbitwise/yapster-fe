@@ -37,7 +37,7 @@ export const BlockUserModal: React.FC<BlockUserModalProps> = ({
     <Modal isOpen={isOpen} onClose={onClose} title="Block User" maxWidth="sm">
       <div className="flex flex-col items-center text-center space-y-4 pt-1">
 
-        <div className="w-14 h-14 rounded-2xl bg-rose-500/15 border border-rose-500/30 flex items-center justify-center text-rose-400 shadow-glow-sm">
+        <div className="w-14 h-14 rounded-2xl bg-rose-500/15 border border-rose-500/30 flex items-center justify-center text-rose-400 ">
           <ShieldAlert className="w-7 h-7" />
         </div>
 
@@ -56,7 +56,7 @@ export const BlockUserModal: React.FC<BlockUserModalProps> = ({
             type="button"
             onClick={onClose}
             disabled={isLoading}
-            className="flex-1 py-2.5 px-4 rounded-xl bg-surface-100 hover:bg-surface-50 text-slate-300 text-xs font-semibold transition-colors border border-card-border disabled:opacity-50"
+            className="flex-1 py-2.5 px-4 rounded-xl bg-surface-100  text-slate-300 text-xs font-semibold transition-colors border border-card-border disabled:opacity-50"
           >
             Cancel
           </button>
@@ -65,7 +65,7 @@ export const BlockUserModal: React.FC<BlockUserModalProps> = ({
             type="button"
             onClick={handleConfirm}
             disabled={isLoading}
-            className="flex-1 flex items-center justify-center gap-1.5 py-2.5 px-4 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-semibold shadow-glow transition-all disabled:opacity-50"
+            className="flex-1 flex items-center justify-center gap-1.5 py-2.5 px-4 rounded-xl bg-rose-600  text-white text-xs font-semibold  transition-all disabled:opacity-50"
           >
             {isLoading ? (
               <Loader2 className="w-4 h-4 animate-spin" />

@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
 import { Avatar } from "@/components/ui/Avatar";
+import { BrandLogo } from "@/components/ui/BrandLogo";
 import { useToast } from "@/context/ToastContext";
 import {
   MessageSquare,
@@ -67,13 +68,7 @@ export default function LandingPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-18 flex items-center justify-between py-3.5">
 
           <Link href="/" className="flex items-center gap-3 group">
-            <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-brand-dark via-brand to-purple-400 p-0.5 shadow-glow group-hover:scale-105 transition-transform">
-              <div className="w-full h-full bg-surface-300 rounded-[14px] flex items-center justify-center">
-                <span className="font-extrabold text-lg text-transparent bg-clip-text bg-gradient-to-r from-brand-light to-purple-200">
-                  Y
-                </span>
-              </div>
-            </div>
+            <BrandLogo className="h-10 w-10" />
             <div className="flex flex-col">
               <span className="text-lg font-bold text-white tracking-tight flex items-center gap-1">
                 Yapster
@@ -87,16 +82,16 @@ export default function LandingPage() {
 
 
           <nav className="hidden md:flex items-center gap-7 text-xs font-medium text-slate-300">
-            <a href="#overview" className="hover:text-white transition-colors">
+            <a href="#overview" className=" transition-colors">
               Why Yapster
             </a>
-            <a href="#nearby" className="hover:text-white transition-colors">
+            <a href="#nearby" className=" transition-colors">
               Find People
             </a>
-            <a href="#how-it-works" className="hover:text-white transition-colors">
+            <a href="#how-it-works" className=" transition-colors">
               How It Works
             </a>
-            <a href="#contact" className="hover:text-white transition-colors">
+            <a href="#contact" className=" transition-colors">
               Contact Us
             </a>
           </nav>
@@ -106,7 +101,7 @@ export default function LandingPage() {
             {isAuthenticated && user ? (
               <Link
                 href="/chat"
-                className="flex items-center gap-2.5 px-4 py-2 rounded-2xl bg-brand hover:bg-brand-dark text-white text-xs font-semibold shadow-glow transition-all hover:scale-105"
+                className="flex items-center gap-2.5 px-4 py-2 rounded-2xl bg-brand  text-white text-xs font-semibold  transition-all "
               >
                 <Avatar
                   src={user.profile_picture}
@@ -122,13 +117,13 @@ export default function LandingPage() {
               <>
                 <Link
                   href="/login"
-                  className="px-4 py-2 rounded-2xl text-xs font-medium text-slate-300 hover:text-white hover:bg-surface-100 transition-colors"
+                  className="px-4 py-2 rounded-2xl text-xs font-medium text-slate-300   transition-colors"
                 >
                   Sign In
                 </Link>
                 <Link
                   href="/register"
-                  className="flex items-center gap-1.5 px-4 py-2 rounded-2xl bg-brand hover:bg-brand-dark text-white text-xs font-semibold shadow-glow transition-all hover:scale-105"
+                  className="flex items-center gap-1.5 px-4 py-2 rounded-2xl bg-brand  text-white text-xs font-semibold  transition-all "
                 >
                   <span>Join Free</span>
                   <ArrowRight className="w-3.5 h-3.5" />
@@ -142,13 +137,13 @@ export default function LandingPage() {
 
       <section className="relative overflow-hidden pt-12 pb-20 lg:pt-20 lg:pb-32">
 
-        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[650px] h-[350px] bg-brand/15 rounded-full blur-[140px] pointer-events-none" />
-        <div className="absolute top-10 left-10 w-72 h-72 bg-purple-700/10 rounded-full blur-[100px] pointer-events-none" />
-        <div className="absolute bottom-10 right-10 w-96 h-96 bg-indigo-600/10 rounded-full blur-[120px] pointer-events-none" />
+
+
+
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
 
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-surface-100/90 border border-brand/40 text-brand-light text-xs font-semibold mb-6 shadow-glow-sm">
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-surface-100/90 border border-brand/40 text-brand-light text-xs font-semibold mb-6 ">
             <Sparkles className="w-3.5 h-3.5" />
             <span>A fresh, exciting way to chat and connect</span>
           </div>
@@ -156,7 +151,7 @@ export default function LandingPage() {
 
           <h1 className="text-4xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight text-white max-w-4xl mx-auto leading-[1.15]">
             Chat with Friends.{" "}
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-light via-brand to-purple-300">
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-light via-brand to-sky-300">
               Discover Who&apos;s Nearby.
             </span>
           </h1>
@@ -172,7 +167,7 @@ export default function LandingPage() {
           <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
             <Link
               href={isAuthenticated ? "/chat" : "/register"}
-              className="flex items-center gap-2 px-6 py-3.5 rounded-2xl bg-brand hover:bg-brand-dark text-white text-sm font-semibold shadow-glow hover:scale-105 active:scale-95 transition-all"
+              className="flex items-center gap-2 px-6 py-3.5 rounded-2xl bg-brand  text-white text-sm font-semibold   active: transition-all"
             >
               <span>{isAuthenticated ? "Open Your Messages" : "Start Yapping Free"}</span>
               <ArrowRight className="w-4 h-4" />
@@ -180,7 +175,7 @@ export default function LandingPage() {
 
             <a
               href="#how-it-works"
-              className="flex items-center gap-2 px-6 py-3.5 rounded-2xl bg-surface-100/90 hover:bg-surface-50 border border-card-border hover:border-brand/50 text-slate-200 hover:text-white text-sm font-medium transition-all"
+              className="flex items-center gap-2 px-6 py-3.5 rounded-2xl bg-surface-100/90  border border-card-border  text-slate-200  text-sm font-medium transition-all"
             >
               <span>See How It Works</span>
             </a>
@@ -239,7 +234,7 @@ export default function LandingPage() {
 
                 <div className="text-xs font-semibold text-slate-400 mb-2">Recent Chats</div>
                 <div className="space-y-2 overflow-y-auto pr-1">
-                  <div className="p-2.5 rounded-xl bg-card border border-brand/40 shadow-glow-sm flex items-center gap-3">
+                  <div className="p-2.5 rounded-xl bg-card border border-brand/40  flex items-center gap-3">
                     <Avatar name="Harper Smith" size="sm" isOnline={true} ringColor="cyan" />
                     <div className="min-w-0 flex-1">
                       <div className="flex justify-between items-center text-xs">
@@ -303,9 +298,9 @@ export default function LandingPage() {
 
 
                   <div className="flex justify-end">
-                    <div className="bg-gradient-to-r from-brand to-brand-vibrant text-white px-3.5 py-2 rounded-2xl rounded-br-sm shadow-glow-sm max-w-[75%]">
+                    <div className="bg-gradient-to-r from-brand to-brand-vibrant text-white px-3.5 py-2 rounded-2xl rounded-br-sm  max-w-[75%]">
                       Yes! Studying here with an iced latte. Come over, let&apos;s hang out!
-                      <div className="text-[9px] text-purple-200 mt-1 flex items-center justify-end gap-1">
+                      <div className="text-[9px] text-sky-200 mt-1 flex items-center justify-end gap-1">
                         10:43 AM <CheckCheck className="w-3 h-3 text-cyan-300" />
                       </div>
                     </div>
@@ -325,7 +320,7 @@ export default function LandingPage() {
                     placeholder="Type a friendly message..."
                     className="flex-1 bg-surface-100 border border-card-border text-xs text-slate-200 px-3.5 py-2 rounded-full outline-none"
                   />
-                  <div className="p-2 rounded-full bg-brand text-white shadow-glow-sm">
+                  <div className="p-2 rounded-full bg-brand text-white ">
                     <Send className="w-3.5 h-3.5" />
                   </div>
                 </div>
@@ -353,8 +348,8 @@ export default function LandingPage() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="bg-card border border-card-border rounded-3xl p-7 shadow-lg relative overflow-hidden group hover:border-brand/40 transition-all">
-              <div className="w-12 h-12 rounded-2xl bg-brand/20 border border-brand/30 flex items-center justify-center text-brand-light mb-5 group-hover:scale-110 transition-transform">
+            <div className="bg-card border border-card-border rounded-3xl p-7 shadow-lg relative overflow-hidden group  transition-all">
+              <div className="w-12 h-12 rounded-2xl bg-brand/20 border border-brand/30 flex items-center justify-center text-brand-light mb-5  transition-transform">
                 <Zap className="w-6 h-6" />
               </div>
               <h4 className="text-lg font-bold text-white mb-2">
@@ -367,8 +362,8 @@ export default function LandingPage() {
               </p>
             </div>
 
-            <div className="bg-card border border-card-border rounded-3xl p-7 shadow-lg relative overflow-hidden group hover:border-brand/40 transition-all">
-              <div className="w-12 h-12 rounded-2xl bg-indigo-500/20 border border-indigo-500/30 flex items-center justify-center text-indigo-400 mb-5 group-hover:scale-110 transition-transform">
+            <div className="bg-card border border-card-border rounded-3xl p-7 shadow-lg relative overflow-hidden group  transition-all">
+              <div className="w-12 h-12 rounded-2xl bg-indigo-500/20 border border-indigo-500/30 flex items-center justify-center text-indigo-400 mb-5  transition-transform">
                 <Compass className="w-6 h-6" />
               </div>
               <h4 className="text-lg font-bold text-white mb-2">
@@ -380,8 +375,8 @@ export default function LandingPage() {
               </p>
             </div>
 
-            <div className="bg-card border border-card-border rounded-3xl p-7 shadow-lg relative overflow-hidden group hover:border-brand/40 transition-all">
-              <div className="w-12 h-12 rounded-2xl bg-purple-500/20 border border-purple-500/30 flex items-center justify-center text-purple-400 mb-5 group-hover:scale-110 transition-transform">
+            <div className="bg-card border border-card-border rounded-3xl p-7 shadow-lg relative overflow-hidden group  transition-all">
+              <div className="w-12 h-12 rounded-2xl bg-brand/10 border border-brand/25 flex items-center justify-center text-sky-400 mb-5  transition-transform">
                 <Shield className="w-6 h-6" />
               </div>
               <h4 className="text-lg font-bold text-white mb-2">
@@ -440,7 +435,7 @@ export default function LandingPage() {
               <div className="pt-2">
                 <Link
                   href={isAuthenticated ? "/chat" : "/register"}
-                  className="inline-flex items-center gap-2 px-5 py-3 rounded-2xl bg-brand hover:bg-brand-dark text-white text-xs font-semibold shadow-glow transition-all"
+                  className="inline-flex items-center gap-2 px-5 py-3 rounded-2xl bg-brand  text-white text-xs font-semibold  transition-all"
                 >
                   <Compass className="w-4 h-4" />
                   <span>Try Finding Friends Nearby</span>
@@ -522,8 +517,8 @@ export default function LandingPage() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="bg-card border border-card-border rounded-3xl p-7 text-center relative group hover:border-brand/40 transition-all">
-              <div className="w-12 h-12 rounded-2xl bg-brand text-white font-bold text-lg flex items-center justify-center mx-auto mb-5 shadow-glow">
+            <div className="bg-card border border-card-border rounded-3xl p-7 text-center relative group  transition-all">
+              <div className="w-12 h-12 rounded-2xl bg-brand text-white font-bold text-lg flex items-center justify-center mx-auto mb-5 ">
                 1
               </div>
               <h4 className="text-lg font-bold text-white mb-2">Create Your Profile</h4>
@@ -532,8 +527,8 @@ export default function LandingPage() {
               </p>
             </div>
 
-            <div className="bg-card border border-card-border rounded-3xl p-7 text-center relative group hover:border-brand/40 transition-all">
-              <div className="w-12 h-12 rounded-2xl bg-brand text-white font-bold text-lg flex items-center justify-center mx-auto mb-5 shadow-glow">
+            <div className="bg-card border border-card-border rounded-3xl p-7 text-center relative group  transition-all">
+              <div className="w-12 h-12 rounded-2xl bg-brand text-white font-bold text-lg flex items-center justify-center mx-auto mb-5 ">
                 2
               </div>
               <h4 className="text-lg font-bold text-white mb-2">Set Your City Area</h4>
@@ -543,8 +538,8 @@ export default function LandingPage() {
               </p>
             </div>
 
-            <div className="bg-card border border-card-border rounded-3xl p-7 text-center relative group hover:border-brand/40 transition-all">
-              <div className="w-12 h-12 rounded-2xl bg-brand text-white font-bold text-lg flex items-center justify-center mx-auto mb-5 shadow-glow">
+            <div className="bg-card border border-card-border rounded-3xl p-7 text-center relative group  transition-all">
+              <div className="w-12 h-12 rounded-2xl bg-brand text-white font-bold text-lg flex items-center justify-center mx-auto mb-5 ">
                 3
               </div>
               <h4 className="text-lg font-bold text-white mb-2">Say Hello &amp; Yap</h4>
@@ -655,7 +650,7 @@ export default function LandingPage() {
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="w-full flex items-center justify-center gap-2 py-3 px-6 rounded-2xl bg-brand hover:bg-brand-dark text-white text-xs font-semibold shadow-glow transition-all disabled:opacity-50"
+                  className="w-full flex items-center justify-center gap-2 py-3 px-6 rounded-2xl bg-brand  text-white text-xs font-semibold  transition-all disabled:opacity-50"
                 >
                   <Send className="w-3.5 h-3.5" />
                   <span>{isSubmitting ? "Sending..." : "Send Message"}</span>
@@ -675,19 +670,19 @@ export default function LandingPage() {
           </div>
 
           <div className="flex items-center gap-6">
-            <a href="#overview" className="hover:text-white transition-colors">
+            <a href="#overview" className=" transition-colors">
               Why Yapster
             </a>
-            <a href="#nearby" className="hover:text-white transition-colors">
+            <a href="#nearby" className=" transition-colors">
               Find People
             </a>
-            <a href="#how-it-works" className="hover:text-white transition-colors">
+            <a href="#how-it-works" className=" transition-colors">
               How It Works
             </a>
-            <a href="#contact" className="hover:text-white transition-colors">
+            <a href="#contact" className=" transition-colors">
               Contact
             </a>
-            <Link href="/login" className="hover:text-white transition-colors">
+            <Link href="/login" className=" transition-colors">
               Sign In
             </Link>
           </div>

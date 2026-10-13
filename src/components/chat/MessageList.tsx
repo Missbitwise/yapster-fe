@@ -117,7 +117,7 @@ export const MessageList: React.FC<MessageListProps> = ({
 
       {!isLoading && messages.length === 0 && (
         <div className="flex flex-col items-center justify-center h-full py-20 text-center px-4">
-          <div className="w-16 h-16 rounded-full bg-surface-100 border border-card-border flex items-center justify-center text-brand-light mb-3 shadow-glow-sm">
+          <div className="w-16 h-16 rounded-full bg-surface-100 border border-card-border flex items-center justify-center text-brand-light mb-3 ">
             ✨
           </div>
           <h4 className="text-base font-semibold text-white mb-1">

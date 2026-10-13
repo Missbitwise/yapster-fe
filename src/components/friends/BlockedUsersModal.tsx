@@ -69,7 +69,7 @@ export const BlockedUsersModal: React.FC<BlockedUsersModalProps> = ({
               <button
                 onClick={() => handleUnblock(user.id)}
                 disabled={unblockingId === user.id}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-surface-50 hover:bg-emerald-500/20 text-slate-300 hover:text-emerald-400 border border-card-border hover:border-emerald-500/30 text-xs font-semibold transition-all disabled:opacity-50"
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-surface-50  text-slate-300  border border-card-border  text-xs font-semibold transition-all disabled:opacity-50"
               >
                 {unblockingId === user.id ? (
                   <Loader2 className="w-3.5 h-3.5 animate-spin" />

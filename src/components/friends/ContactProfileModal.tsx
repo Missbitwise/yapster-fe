@@ -109,7 +109,7 @@ export const ContactProfileModal: React.FC<ContactProfileModalProps> = ({
                 onClose();
                 onSendMessage();
               }}
-              className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-2xl bg-brand hover:bg-brand-dark text-white text-xs font-semibold shadow-glow transition-all"
+              className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-2xl bg-brand  text-white text-xs font-semibold  transition-all"
             >
               <MessageSquare className="w-4 h-4" />
               <span>Send Message</span>
@@ -124,8 +124,8 @@ export const ContactProfileModal: React.FC<ContactProfileModalProps> = ({
               }}
               className={`w-full flex items-center justify-center gap-2 py-2 px-4 rounded-2xl text-xs font-medium border transition-all ${
                 isBlocked
-                  ? "bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-300 border-emerald-500/30"
-                  : "bg-rose-500/10 hover:bg-rose-500/20 text-rose-300 border-rose-500/20"
+                  ? "bg-emerald-500/15  text-emerald-300 border-emerald-500/30"
+                  : "bg-rose-500/10  text-rose-300 border-rose-500/20"
               }`}
             >
               {isBlocked ? (

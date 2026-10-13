@@ -157,7 +157,7 @@ export const NearbyRadar: React.FC<NearbyRadarProps> = ({
             <button
               onClick={detectLocation}
               disabled={isUpdatingLocation}
-              className="flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-brand hover:bg-brand-dark text-white text-xs font-semibold shadow-glow transition-all disabled:opacity-50"
+              className="flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-brand  text-white text-xs font-semibold  transition-all disabled:opacity-50"
             >
               {isUpdatingLocation ? (
                 <Loader2 className="w-4 h-4 animate-spin" />
@@ -169,7 +169,7 @@ export const NearbyRadar: React.FC<NearbyRadarProps> = ({
 
             <button
               onClick={() => setShowManualForm(!showManualForm)}
-              className="px-3.5 py-2.5 rounded-2xl bg-surface-100 border border-card-border hover:border-brand/60 text-slate-300 hover:text-white text-xs font-medium transition-colors"
+              className="px-3.5 py-2.5 rounded-2xl bg-surface-100 border border-card-border  text-slate-300  text-xs font-medium transition-colors"
             >
               Set City Manually
             </button>
@@ -211,7 +211,7 @@ export const NearbyRadar: React.FC<NearbyRadarProps> = ({
           <button
             type="submit"
             disabled={isUpdatingLocation}
-            className="px-4 py-2 bg-brand text-white rounded-xl text-xs font-semibold hover:bg-brand-dark transition-colors"
+            className="px-4 py-2 bg-brand text-white rounded-xl text-xs font-semibold  transition-colors"
           >
             Save Location
           </button>
@@ -243,7 +243,7 @@ export const NearbyRadar: React.FC<NearbyRadarProps> = ({
           />
           <button
             onClick={() => fetchNearby(radius)}
-            className="px-3 py-1 bg-surface-100 hover:bg-surface-50 border border-card-border rounded-xl text-xs text-slate-300 hover:text-white transition-colors"
+            className="px-3 py-1 bg-surface-100  border border-card-border rounded-xl text-xs text-slate-300  transition-colors"
           >
             Refresh
           </button>
@@ -256,7 +256,7 @@ export const NearbyRadar: React.FC<NearbyRadarProps> = ({
           <span>{error}</span>
           <button
             onClick={detectLocation}
-            className="underline hover:text-white font-semibold ml-2"
+            className="underline  font-semibold ml-2"
           >
             Enable Location
           </button>
@@ -284,7 +284,7 @@ export const NearbyRadar: React.FC<NearbyRadarProps> = ({
               setRadius(50);
               fetchNearby(50);
             }}
-            className="px-4 py-2 rounded-xl bg-surface-100 border border-card-border text-xs text-brand-light hover:text-white hover:border-brand transition-colors"
+            className="px-4 py-2 rounded-xl bg-surface-100 border border-card-border text-xs text-brand-light   transition-colors"
           >
             Expand to 50 km
           </button>
@@ -298,7 +298,7 @@ export const NearbyRadar: React.FC<NearbyRadarProps> = ({
               return (
                 <div
                   key={user.id}
-                  className="bg-card border border-card-border hover:border-brand/50 rounded-3xl p-5 shadow-lg flex flex-col justify-between transition-all group hover:shadow-glow-sm"
+                  className="bg-card border border-card-border  rounded-3xl p-5 shadow-lg flex flex-col justify-between transition-all group "
                 >
                 <div>
                   <div className="flex items-start justify-between gap-3 mb-3">
@@ -315,7 +315,7 @@ export const NearbyRadar: React.FC<NearbyRadarProps> = ({
                     </span>
                   </div>
 
-                  <h3 className="text-base font-bold text-white group-hover:text-brand-light transition-colors truncate">
+                  <h3 className="text-base font-bold text-white  transition-colors truncate">
                     {user.name}
                   </h3>
                   <p className="text-xs text-slate-400 mb-2 truncate">
@@ -349,7 +349,7 @@ export const NearbyRadar: React.FC<NearbyRadarProps> = ({
                           friends_since: new Date().toISOString(),
                         })
                       }
-                      className="flex-1 flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl bg-brand hover:bg-brand-dark text-white text-xs font-semibold shadow-glow-sm transition-all"
+                      className="flex-1 flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl bg-brand  text-white text-xs font-semibold  transition-all"
                     >
                       <MessageCircle className="w-3.5 h-3.5" />
                       <span>Chat</span>
@@ -357,7 +357,7 @@ export const NearbyRadar: React.FC<NearbyRadarProps> = ({
                   ) : isRequested ? (
                     <button
                       onClick={() => handleCancelRequest(user.id, user.name)}
-                      className="flex-1 flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl text-xs font-semibold bg-rose-500/10 hover:bg-rose-500/20 text-rose-300 border border-rose-500/30 transition-all shadow-sm"
+                      className="flex-1 flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl text-xs font-semibold bg-rose-500/10  text-rose-300 border border-rose-500/30 transition-all shadow-sm"
                       title="Cancel sent friend request"
                     >
                       <UserX className="w-3.5 h-3.5" />
@@ -366,7 +366,7 @@ export const NearbyRadar: React.FC<NearbyRadarProps> = ({
                   ) : (
                     <button
                       onClick={() => handleSendRequest(user.id, user.name)}
-                      className="flex-1 flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl text-xs font-semibold bg-surface-100 hover:bg-brand text-slate-200 hover:text-white border border-card-border hover:border-brand shadow-sm transition-all"
+                      className="flex-1 flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl text-xs font-semibold bg-surface-100  text-slate-200  border border-card-border  shadow-sm transition-all"
                     >
                       <UserPlus className="w-3.5 h-3.5" />
                       <span>Add Friend</span>
@@ -375,7 +375,7 @@ export const NearbyRadar: React.FC<NearbyRadarProps> = ({
 
                   <button
                     onClick={() => setUserToBlock({ id: user.id, name: user.name })}
-                    className="p-2 rounded-xl text-slate-500 hover:text-rose-400 hover:bg-rose-500/10 transition-colors"
+                    className="p-2 rounded-xl text-slate-500   transition-colors"
                     title="Block user"
                   >
                     <ShieldAlert className="w-4 h-4" />

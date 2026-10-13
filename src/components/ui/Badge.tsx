@@ -15,9 +15,9 @@ export const Badge: React.FC<BadgeProps> = ({
 }) => {
   const variantStyles = {
     purple:
-      "bg-brand text-white shadow-[0_0_10px_rgba(138,63,252,0.4)] font-medium",
+      "bg-brand text-white  font-medium",
     active:
-      "bg-purple-900/60 border border-purple-500/40 text-purple-200 shadow-sm",
+      "bg-surface-100 border border-card-border text-sky-200 shadow-sm",
     neutral: "bg-surface-100 text-slate-300 border border-card-border",
     danger: "bg-rose-900/50 text-rose-300 border border-rose-700/50",
   };

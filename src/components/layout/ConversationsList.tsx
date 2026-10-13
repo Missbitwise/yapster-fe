@@ -66,7 +66,7 @@ export const ConversationsList: React.FC<ConversationsListProps> = ({
           {onOpenNearby && (
             <button
               onClick={onOpenNearby}
-              className="p-1.5 rounded-xl bg-surface-100 border border-card-border hover:border-brand text-brand-light hover:text-white transition-all text-xs flex items-center gap-1.5"
+              className="p-1.5 rounded-xl bg-surface-100 border border-card-border  text-brand-light  transition-all text-xs flex items-center gap-1.5"
               title="Explore Nearby Friends"
             >
               <Sparkles className="w-3.5 h-3.5" />
@@ -110,11 +110,7 @@ export const ConversationsList: React.FC<ConversationsListProps> = ({
                     onClick={() => onSelectContact(friend)}
                     className="flex flex-col items-center gap-1.5 shrink-0 group focus:outline-none"
                   >
-                    <div
-                      className={`p-0.5 rounded-full transition-transform group-hover:scale-105 ${
-                        isSelected ? "scale-105 ring-2 ring-brand" : ""
-                      }`}
-                    >
+                    <div className="rounded-full">
                       <Avatar
                         src={friend.profile_picture}
                         name={friend.name}
@@ -123,7 +119,7 @@ export const ConversationsList: React.FC<ConversationsListProps> = ({
                         isOnline={true}
                       />
                     </div>
-                    <span className="text-[11px] font-medium text-slate-300 max-w-[62px] truncate group-hover:text-white">
+                    <span className="text-[11px] font-medium text-slate-300 max-w-[62px] truncate ">
                       {friend.name.split(" ")[0]}
                     </span>
                   </button>
@@ -178,8 +174,8 @@ export const ConversationsList: React.FC<ConversationsListProps> = ({
                     onClick={() => onSelectContact(friend)}
                     className={`w-full flex items-center gap-3 p-3 rounded-2xl transition-all text-left group ${
                       isSelected
-                        ? "bg-card border border-brand/50 shadow-glow-sm"
-                        : "hover:bg-surface-100/70 border border-transparent"
+                        ? "bg-card border border-brand/50 "
+                        : " border border-transparent"
                     }`}
                   >
                     <Avatar
@@ -192,7 +188,7 @@ export const ConversationsList: React.FC<ConversationsListProps> = ({
 
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center justify-between gap-1 mb-0.5">
-                        <h3 className="text-sm font-semibold text-white truncate group-hover:text-brand-light transition-colors">
+                        <h3 className="text-sm font-semibold text-white truncate  transition-colors">
                           {friend.name}
                         </h3>
                         <span className="text-[10px] text-slate-400 shrink-0">
@@ -221,7 +217,7 @@ export const ConversationsList: React.FC<ConversationsListProps> = ({
                           )}
                         </p>
                         {unreadCount > 0 && !blocked && !isSelected && (
-                          <span className="shrink-0 flex items-center justify-center min-w-[20px] h-[20px] px-1.5 text-[11px] font-bold rounded-full bg-brand text-white shadow-glow-sm animate-in fade-in">
+                          <span className="shrink-0 flex items-center justify-center min-w-[20px] h-[20px] px-1.5 text-[11px] font-bold rounded-full bg-brand text-white  animate-in fade-in">
                             {unreadCount > 99 ? "99+" : unreadCount}
                           </span>
                         )}

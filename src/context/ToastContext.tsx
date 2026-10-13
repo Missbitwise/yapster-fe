@@ -56,7 +56,7 @@ export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({
               if (toast.onClick) toast.onClick();
               removeToast(toast.id);
             }}
-            className="pointer-events-auto bg-card border border-brand/40 shadow-glow rounded-2xl p-3.5 flex items-start gap-3 text-slate-100 backdrop-blur-md cursor-pointer hover:border-brand transition-all animate-in slide-in-from-top-4 duration-200"
+            className="pointer-events-auto bg-card border border-brand/40  rounded-2xl p-3.5 flex items-start gap-3 text-slate-100 backdrop-blur-md cursor-pointer  transition-all animate-in slide-in-from-top-4 duration-200"
           >
             {toast.avatarName ? (
               <Avatar
@@ -95,7 +95,7 @@ export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({
                 e.stopPropagation();
                 removeToast(toast.id);
               }}
-              className="text-slate-400 hover:text-white p-1"
+              className="text-slate-400  p-1"
             >
               <X className="w-4 h-4" />
             </button>

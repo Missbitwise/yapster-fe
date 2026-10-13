@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
+import { BrandLogo } from "@/components/ui/BrandLogo";
 import { Lock, Mail, Loader2, ArrowRight, Sparkles } from "lucide-react";
 
 export default function LoginPage() {
@@ -39,20 +40,14 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen bg-background flex flex-col justify-center items-center px-4 py-12 relative overflow-hidden">
 
-      <div className="absolute top-1/4 -left-20 w-80 h-80 bg-brand/20 rounded-full blur-[120px] pointer-events-none" />
-      <div className="absolute bottom-1/4 -right-20 w-80 h-80 bg-purple-600/15 rounded-full blur-[120px] pointer-events-none" />
+
+
 
 
       <div className="relative w-full max-w-md bg-card/90 border border-card-border/80 rounded-3xl p-8 shadow-2xl backdrop-blur-xl">
 
         <div className="flex flex-col items-center text-center mb-8">
-          <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-brand-dark via-brand to-purple-400 p-0.5 shadow-glow mb-4">
-            <div className="w-full h-full bg-surface-300 rounded-[14px] flex items-center justify-center">
-              <span className="font-extrabold text-2xl text-transparent bg-clip-text bg-gradient-to-r from-brand-light to-purple-200">
-                Y
-              </span>
-            </div>
-          </div>
+          <BrandLogo className="mb-4 h-14 w-14" />
           <h1 className="text-2xl font-bold text-white tracking-tight">
             Welcome to Yapster
           </h1>
@@ -107,7 +102,7 @@ export default function LoginPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full mt-2 flex items-center justify-center gap-2 py-3 px-4 rounded-2xl bg-brand hover:bg-brand-dark text-white text-sm font-semibold shadow-glow transition-all disabled:opacity-50"
+            className="w-full mt-2 flex items-center justify-center gap-2 py-3 px-4 rounded-2xl bg-brand  text-white text-sm font-semibold  transition-all disabled:opacity-50"
           >
             {loading ? (
               <Loader2 className="w-4 h-4 animate-spin" />
@@ -124,7 +119,7 @@ export default function LoginPage() {
           Don&apos;t have an account?{" "}
           <Link
             href="/register"
-            className="text-brand-light font-semibold hover:underline"
+            className="text-brand-light font-semibold "
           >
             Create one now
           </Link>

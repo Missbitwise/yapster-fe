@@ -193,8 +193,8 @@ export const EmojiGifPicker: React.FC<EmojiGifPickerProps> = ({
             onClick={() => setActiveTab("emojis")}
             className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold transition-all ${
               activeTab === "emojis"
-                ? "bg-brand text-white shadow-glow-sm"
-                : "text-slate-400 hover:text-white"
+                ? "bg-brand text-white "
+                : "text-slate-400 "
             }`}
           >
             <Smile className="w-3.5 h-3.5" />
@@ -206,8 +206,8 @@ export const EmojiGifPicker: React.FC<EmojiGifPickerProps> = ({
             onClick={() => setActiveTab("gifs")}
             className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold transition-all ${
               activeTab === "gifs"
-                ? "bg-brand text-white shadow-glow-sm"
-                : "text-slate-400 hover:text-white"
+                ? "bg-brand text-white "
+                : "text-slate-400 "
             }`}
           >
             <ImageIcon className="w-3.5 h-3.5" />
@@ -218,7 +218,7 @@ export const EmojiGifPicker: React.FC<EmojiGifPickerProps> = ({
         <button
           type="button"
           onClick={onClose}
-          className="p-1.5 text-slate-400 hover:text-white hover:bg-surface-100 rounded-full transition-colors"
+          className="p-1.5 text-slate-400   rounded-full transition-colors"
           title="Close picker"
         >
           <X className="w-4 h-4" />
@@ -252,7 +252,7 @@ export const EmojiGifPicker: React.FC<EmojiGifPickerProps> = ({
               className={`flex items-center gap-1 px-2.5 py-1 rounded-lg shrink-0 transition-colors ${
                 selectedCategory === cat.name
                   ? "bg-brand/20 text-brand-light font-medium border border-brand/30"
-                  : "text-slate-400 hover:text-slate-200"
+                  : "text-slate-400 "
               }`}
             >
               <span>{cat.icon}</span>
@@ -271,7 +271,7 @@ export const EmojiGifPicker: React.FC<EmojiGifPickerProps> = ({
                 key={`${emoji}-${idx}`}
                 type="button"
                 onClick={() => onSelectEmoji(emoji)}
-                className="w-8 h-8 flex items-center justify-center text-lg hover:bg-surface-100 rounded-xl transition-transform hover:scale-125 focus:outline-none select-none active:scale-95"
+                className="w-8 h-8 flex items-center justify-center text-lg  rounded-xl transition-transform  focus:outline-none select-none active:"
               >
                 {emoji}
               </button>
@@ -284,7 +284,7 @@ export const EmojiGifPicker: React.FC<EmojiGifPickerProps> = ({
                 key={`${gif.url}-${idx}`}
                 type="button"
                 onClick={() => onSelectGif(gif.url)}
-                className="group relative rounded-xl overflow-hidden aspect-video bg-surface-100 border border-card-border/70 hover:border-brand transition-all hover:scale-[1.02] focus:outline-none shadow-md"
+                className="group relative rounded-xl overflow-hidden aspect-video bg-surface-100 border border-card-border/70  transition-all  focus:outline-none shadow-md"
               >
                 <img
                   src={gif.preview}
@@ -292,7 +292,7 @@ export const EmojiGifPicker: React.FC<EmojiGifPickerProps> = ({
                   className="w-full h-full object-cover"
                   loading="lazy"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-1.5">
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0  transition-opacity flex items-end p-1.5">
                   <span className="text-[10px] font-medium text-white truncate">
                     {gif.title}
                   </span>
