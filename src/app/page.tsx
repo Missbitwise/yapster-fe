@@ -62,10 +62,10 @@ export default function LandingPage() {
 
   return (
     <div className="min-h-screen bg-background text-slate-100 flex flex-col selection:bg-brand selection:text-white">
-      {/* 1. TOP NAVIGATION BAR */}
+
       <header className="sticky top-0 z-40 w-full bg-background/80 backdrop-blur-xl border-b border-card-border/70">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-18 flex items-center justify-between py-3.5">
-          {/* Brand Logo */}
+
           <Link href="/" className="flex items-center gap-3 group">
             <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-brand-dark via-brand to-purple-400 p-0.5 shadow-glow group-hover:scale-105 transition-transform">
               <div className="w-full h-full bg-surface-300 rounded-[14px] flex items-center justify-center">
@@ -85,7 +85,7 @@ export default function LandingPage() {
             </div>
           </Link>
 
-          {/* User-friendly Nav Links */}
+
           <nav className="hidden md:flex items-center gap-7 text-xs font-medium text-slate-300">
             <a href="#overview" className="hover:text-white transition-colors">
               Why Yapster
@@ -101,7 +101,7 @@ export default function LandingPage() {
             </a>
           </nav>
 
-          {/* Auth Actions */}
+
           <div className="flex items-center gap-3">
             {isAuthenticated && user ? (
               <Link
@@ -139,21 +139,21 @@ export default function LandingPage() {
         </div>
       </header>
 
-      {/* 2. HERO SECTION */}
+
       <section className="relative overflow-hidden pt-12 pb-20 lg:pt-20 lg:pb-32">
-        {/* Soft background glows */}
+
         <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[650px] h-[350px] bg-brand/15 rounded-full blur-[140px] pointer-events-none" />
         <div className="absolute top-10 left-10 w-72 h-72 bg-purple-700/10 rounded-full blur-[100px] pointer-events-none" />
         <div className="absolute bottom-10 right-10 w-96 h-96 bg-indigo-600/10 rounded-full blur-[120px] pointer-events-none" />
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
-          {/* Friendly Badge */}
+
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-surface-100/90 border border-brand/40 text-brand-light text-xs font-semibold mb-6 shadow-glow-sm">
             <Sparkles className="w-3.5 h-3.5" />
             <span>A fresh, exciting way to chat and connect</span>
           </div>
 
-          {/* Heading */}
+
           <h1 className="text-4xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight text-white max-w-4xl mx-auto leading-[1.15]">
             Chat with Friends.{" "}
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-light via-brand to-purple-300">
@@ -161,14 +161,14 @@ export default function LandingPage() {
             </span>
           </h1>
 
-          {/* Subtitle */}
+
           <p className="mt-6 text-sm sm:text-lg text-slate-300 max-w-2xl mx-auto leading-relaxed">
             Yapster is the sleek, private messaging app where you can talk
             effortlessly with your best friends and discover people hanging out
             right in your neighborhood, campus, or city.
           </p>
 
-          {/* Hero CTAs */}
+
           <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
             <Link
               href={isAuthenticated ? "/chat" : "/register"}
@@ -186,7 +186,7 @@ export default function LandingPage() {
             </a>
           </div>
 
-          {/* Simple benefit pills */}
+
           <div className="mt-12 flex flex-wrap items-center justify-center gap-3 sm:gap-6 text-xs text-slate-400">
             <span className="flex items-center gap-1.5 bg-surface-100/60 px-3.5 py-1.5 rounded-full border border-card-border/60">
               <Zap className="w-3.5 h-3.5 text-brand-light" />
@@ -202,7 +202,7 @@ export default function LandingPage() {
             </span>
           </div>
 
-          {/* 3. HERO PRODUCT MOCKUP PREVIEW */}
+
           <div className="mt-16 relative max-w-4xl mx-auto rounded-3xl bg-card border border-card-border p-3 sm:p-5 shadow-2xl overflow-hidden text-left">
             <div className="flex items-center justify-between border-b border-card-border pb-3 mb-4 px-2">
               <div className="flex items-center gap-2">
@@ -220,14 +220,14 @@ export default function LandingPage() {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-12 gap-4 h-[420px]">
-              {/* Left pane: Active friends & conversations preview */}
+
               <div className="hidden md:flex md:col-span-5 flex-col bg-surface-200/90 rounded-2xl p-4 border border-card-border/70 overflow-hidden">
                 <div className="text-xs font-bold text-white uppercase tracking-wider mb-3 flex items-center justify-between">
                   <span>Currently Online</span>
                   <span className="w-2 h-2 rounded-full bg-emerald-400" />
                 </div>
 
-                {/* Avatars rail */}
+
                 <div className="flex items-center gap-3 overflow-x-auto pb-3 mb-4 border-b border-card-border/60 scrollbar-none">
                   {["Harper", "Ethan", "Isabelle", "Alex"].map((name) => (
                     <div key={name} className="flex flex-col items-center gap-1 shrink-0">
@@ -265,9 +265,9 @@ export default function LandingPage() {
                 </div>
               </div>
 
-              {/* Right pane: Chat Conversation preview */}
+
               <div className="md:col-span-7 flex flex-col bg-surface-300 rounded-2xl border border-card-border/70 overflow-hidden">
-                {/* Chat Header */}
+
                 <div className="flex items-center justify-between px-4 py-3 bg-surface-200/90 border-b border-card-border/60">
                   <div className="flex items-center gap-2.5">
                     <Avatar name="Harper Smith" size="sm" isOnline={true} ringColor="cyan" />
@@ -284,7 +284,7 @@ export default function LandingPage() {
                   </span>
                 </div>
 
-                {/* Messages stream */}
+
                 <div className="flex-1 p-4 space-y-3 overflow-y-auto text-xs">
                   <div className="flex justify-center">
                     <span className="px-2.5 py-0.5 text-[10px] bg-surface-100 text-slate-400 rounded-full border border-card-border">
@@ -292,7 +292,7 @@ export default function LandingPage() {
                     </span>
                   </div>
 
-                  {/* Incoming bubble */}
+
                   <div className="flex items-end gap-2">
                     <Avatar name="Harper Smith" size="xs" />
                     <div className="bg-surface-100 text-slate-100 px-3.5 py-2 rounded-2xl rounded-bl-sm border border-card-border/60 max-w-[75%]">
@@ -301,7 +301,7 @@ export default function LandingPage() {
                     </div>
                   </div>
 
-                  {/* Outgoing bubble in purple */}
+
                   <div className="flex justify-end">
                     <div className="bg-gradient-to-r from-brand to-brand-vibrant text-white px-3.5 py-2 rounded-2xl rounded-br-sm shadow-glow-sm max-w-[75%]">
                       Yes! Studying here with an iced latte. Come over, let&apos;s hang out!
@@ -311,13 +311,13 @@ export default function LandingPage() {
                     </div>
                   </div>
 
-                  {/* Typing animation */}
+
                   <div className="flex items-center gap-2 text-[10px] text-brand-light font-medium pl-6">
                     <span>Harper is typing...</span>
                   </div>
                 </div>
 
-                {/* Input mock */}
+
                 <div className="p-3 bg-surface-200/90 border-t border-card-border/60 flex items-center gap-2">
                   <input
                     type="text"
@@ -335,7 +335,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* 4. "WHY YAPSTER?" OVERVIEW SECTION */}
+
       <section id="overview" className="py-20 bg-surface-400 border-t border-card-border/70 relative">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-3xl mx-auto mb-16">
@@ -396,7 +396,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* 5. FIND PEOPLE NEARBY SPOTLIGHT SECTION */}
+
       <section id="nearby" className="py-20 bg-surface-400 border-t border-card-border/70 relative overflow-hidden">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
@@ -448,7 +448,7 @@ export default function LandingPage() {
               </div>
             </div>
 
-            {/* Visual Cards */}
+
             <div className="lg:col-span-6">
               <div className="bg-card border border-card-border rounded-3xl p-6 shadow-2xl relative">
                 <div className="flex items-center justify-between pb-4 mb-4 border-b border-card-border/60">
@@ -509,7 +509,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* 7. HOW IT WORKS 3-STEP WALKTHROUGH */}
+
       <section id="how-it-works" className="py-20 bg-background relative">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-3xl mx-auto mb-16">
@@ -557,11 +557,11 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* 8. CONTACT US SECTION */}
+
       <section id="contact" className="py-20 bg-surface-400 border-t border-card-border/70 relative">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
-            {/* Contact Info */}
+
             <div className="lg:col-span-5 space-y-6">
               <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-brand/15 text-brand-light border border-brand/30 text-xs font-semibold">
                 <Mail className="w-3.5 h-3.5" />
@@ -589,7 +589,7 @@ export default function LandingPage() {
               </div>
             </div>
 
-            {/* Contact Form */}
+
             <div className="lg:col-span-7">
               <form
                 onSubmit={handleContactSubmit}
@@ -666,7 +666,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* 9. FOOTER */}
+
       <footer className="mt-auto bg-surface-400 border-t border-card-border/80 py-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-400">
           <div className="flex items-center gap-2">

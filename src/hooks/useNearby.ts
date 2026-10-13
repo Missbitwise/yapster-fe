@@ -29,7 +29,6 @@ export const useNearby = (initialRadius: number = 10) => {
         }
       } catch (err: any) {
         console.warn("Nearby fetch:", err.response?.data?.message || err.message);
-        // If error message indicates no location has been set yet, show friendly guidance
         setError(
           err.response?.data?.message ||
             "Please update your location to discover nearby friends."
@@ -83,7 +82,6 @@ export const useNearby = (initialRadius: number = 10) => {
           const lat = position.coords.latitude;
           const lng = position.coords.longitude;
 
-          // Attempt reverse geocode locality estimate
           let locality = "Current Location";
           try {
             const geocodeRes = await fetch(

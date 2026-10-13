@@ -55,6 +55,7 @@ export type IncomingWebSocketPayload =
       status: "online" | "offline";
       lastSeen?: string | null;
       isBlockedBy?: boolean;
+      isHidden?: boolean;
     }
   | {
       type: "message";

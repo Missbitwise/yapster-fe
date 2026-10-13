@@ -14,7 +14,7 @@ body {
   overflow-x: hidden;
 }
 
-/* Custom dark scrollbar */
+
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
@@ -33,7 +33,7 @@ body {
   background: #8a3ffc;
 }
 
-/* Glowing animations */
+
 @keyframes pulse-subtle {
   0%, 100% {
     opacity: 1;

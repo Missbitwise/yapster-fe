@@ -31,7 +31,6 @@ apiClient.interceptors.response.use(
   (error: AxiosError) => {
     if (error.response?.status === 401) {
       if (typeof window !== "undefined") {
-        // If not already on /login or /register, can broadcast logout
         const currentPath = window.location.pathname;
         if (currentPath !== "/login" && currentPath !== "/register") {
           localStorage.removeItem("yapster_token");

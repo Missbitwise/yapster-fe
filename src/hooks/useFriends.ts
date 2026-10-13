@@ -101,7 +101,6 @@ export const useFriends = () => {
     action: "accept" | "reject"
   ) => {
     const res = await friendService.respondRequest(requestId, action);
-    // Optimistically update requests list
     setRequests((prev) => prev.filter((r) => r.id !== requestId));
     if (action === "accept") {
       await fetchFriends();

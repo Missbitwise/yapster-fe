@@ -22,6 +22,7 @@ export interface PresenceInfo {
   status: "online" | "offline";
   lastSeen?: string | null;
   isBlockedBy?: boolean;
+  isHidden?: boolean;
 }
 
 interface WebSocketContextType {
@@ -186,8 +187,14 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({
         try {
           const payload = JSON.parse(event.data) as IncomingWebSocketPayload;
 
-          // Internal presence handling
           if (payload.type === "presence") {
+            console.info("[presence:ws] update received", {
+              userId: payload.userId,
+              status: payload.status,
+              lastSeen: payload.lastSeen ?? null,
+              isBlockedBy: payload.isBlockedBy ?? null,
+              isHidden: payload.isHidden ?? null,
+            });
             setPresenceMap((prev) => ({
               ...prev,
               [payload.userId]: {
@@ -200,19 +207,29 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({
                   payload.isBlockedBy !== undefined
                     ? payload.isBlockedBy
                     : prev[payload.userId]?.isBlockedBy,
+                isHidden:
+                  payload.isHidden !== undefined
+                    ? payload.isHidden
+                    : prev[payload.userId]?.isHidden,
               },
             }));
           }
 
-          // Unread count update from server
+          if (payload.type === "error") {
+            console.error("[websocket:server-error]", payload);
+          }
+
           if (payload.type === "unread_count") {
+            console.info("[unread:ws] server summary received", {
+              totalUnread: payload.data.totalUnread,
+              unreadBySender: payload.data.unreadBySender ?? {},
+            });
             setUnreadTotal(Math.max(0, payload.data.totalUnread));
             if (payload.data.unreadBySender) {
               setUnreadCountsByContact(payload.data.unreadBySender);
             }
           }
 
-          // Real-time incoming message counter per sender
           if (payload.type === "message") {
             const msg = payload.data;
             if (msg.receiverId === user?.id) {
@@ -223,14 +240,12 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({
             }
           }
 
-          // Typing indicators
           if (payload.type === "typing") {
             setTypingMap((prev) => ({
               ...prev,
               [payload.userId]: true,
             }));
 
-            // Auto-clear typing indicator after 4 seconds of no update
             if (typingTimeoutsRef.current[payload.userId]) {
               clearTimeout(typingTimeoutsRef.current[payload.userId]);
             }
@@ -252,7 +267,6 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({
             }
           }
 
-          // Broadcast to all active subscribers
           subscribersRef.current.forEach((handler) => {
             try {
               handler(payload);
@@ -269,7 +283,6 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({
         setIsConnected(false);
         socketRef.current = null;
 
-        // Do not auto-reconnect if closed deliberately (code 1000) or unauthorized (code 1008)
         if (event.code !== 1000 && event.code !== 1008 && token) {
           const backoff = Math.min(
             1000 * Math.pow(1.5, reconnectAttemptRef.current),
@@ -293,7 +306,6 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({
   useEffect(() => {
     if (token && user) {
       connect();
-      // Fetch initial unread counts grouped by sender
       messageService
         .getUnreadSummary()
         .then((res) => {

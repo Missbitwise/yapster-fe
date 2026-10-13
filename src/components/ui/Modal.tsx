@@ -43,13 +43,13 @@ export const Modal: React.FC<ModalProps> = ({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      {/* Backdrop */}
+
       <div
         className="fixed inset-0 bg-black/75 backdrop-blur-sm transition-opacity"
         onClick={onClose}
       />
 
-      {/* Modal Container */}
+
       <div
         className={`relative w-full ${maxWidthClasses[maxWidth]} bg-card border border-card-border rounded-3xl p-6 shadow-2xl z-10 overflow-hidden text-slate-100 animate-in fade-in zoom-in-95 duration-150`}
       >

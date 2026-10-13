@@ -34,20 +34,16 @@ export const useChat = (activeContactId: string | null) => {
 
   const currentUserId = user?.id;
 
-  // Mark all unread messages received from the active contact as read
   const markMessagesAsRead = useCallback(
     (msgList: Message[]) => {
       if (!currentUserId || !activeContactId) return;
 
-      // Clear unread badge for this contact in sidebar and contacts list immediately
       clearUnreadForContact(activeContactId);
 
-      // Only mark as read if the document/tab is currently visible
       if (typeof document !== "undefined" && document.visibilityState !== "visible") {
         return;
       }
 
-      // Filter unread incoming messages from the active contact
       const unreadIncoming = msgList.filter(
         (m) =>
           String(m.receiverId) === String(currentUserId) &&
@@ -56,7 +52,6 @@ export const useChat = (activeContactId: string | null) => {
           !m._id.startsWith("temp-")
       );
 
-      // Optimistically mark them as read in local state
       if (unreadIncoming.length > 0) {
         setMessages((prev) =>
           prev.map((m) =>
@@ -68,7 +63,6 @@ export const useChat = (activeContactId: string | null) => {
           )
         );
 
-        // Send individual read WS events (ensures compatibility with all backend versions)
         unreadIncoming.forEach((m) => {
           sendReadWs(m._id);
         });
@@ -76,15 +70,32 @@ export const useChat = (activeContactId: string | null) => {
         setUnreadTotal((prev) => Math.max(0, prev - unreadIncoming.length));
       }
 
-      // Send conversation read event via WS
       sendReadConversationWs(activeContactId);
-      // Also send HTTP fallback
-      messageService.markConversationAsRead(activeContactId).catch(() => {});
+      messageService
+        .markConversationAsRead(activeContactId)
+        .then((res) => {
+          if (!res.success || !res.data) return;
+
+          clearUnreadForContact(activeContactId);
+          setUnreadTotal(res.data.totalUnread);
+          console.info("[chat:read] server confirmed conversation read", {
+            contactId: activeContactId,
+            readCount: res.data.readCount,
+            totalUnread: res.data.totalUnread,
+          });
+        })
+        .catch((err: any) => {
+          console.error("[chat:read] request failed", {
+            contactId: activeContactId,
+            status: err.response?.status,
+            response: err.response?.data,
+            message: err.message,
+          });
+        });
     },
     [currentUserId, activeContactId, clearUnreadForContact, sendReadWs, sendReadConversationWs, setUnreadTotal]
   );
 
-  // When user returns to this tab / window, mark any unread messages as read
   useEffect(() => {
     const handleVisibilityOrFocus = () => {
       if (typeof document !== "undefined" && document.visibilityState === "visible") {
@@ -103,7 +114,6 @@ export const useChat = (activeContactId: string | null) => {
     };
   }, [markMessagesAsRead]);
 
-  // Load initial messages for active conversation
   const loadInitialMessages = useCallback(async () => {
     if (!activeContactId) {
       setMessages([]);
@@ -122,15 +132,25 @@ export const useChat = (activeContactId: string | null) => {
       );
       if (res.success && res.data) {
         const fetchedMessages = res.data.messages || [];
+        console.info("[chat:history] loaded", {
+          contactId: activeContactId,
+          count: fetchedMessages.length,
+          ids: fetchedMessages.map((message) => message._id),
+        });
         setMessages(fetchedMessages);
         setNextCursor(res.data.nextCursor);
         setHasMore(res.data.hasMore);
 
-        // Mark incoming messages as read and clear unread count
         markMessagesAsRead(fetchedMessages);
       }
     } catch (err: any) {
       console.error("Failed to load messages:", err);
+      console.error("[chat:history] request failed", {
+        contactId: activeContactId,
+        status: err.response?.status,
+        response: err.response?.data,
+        message: err.message,
+      });
       setError(err.response?.data?.message || "Failed to load messages");
     } finally {
       setIsLoading(false);
@@ -141,7 +161,6 @@ export const useChat = (activeContactId: string | null) => {
     loadInitialMessages();
   }, [loadInitialMessages]);
 
-  // Load older messages for cursor pagination when scrolling to top
   const loadOlderMessages = useCallback(async () => {
     if (
       !activeContactId ||
@@ -182,7 +201,6 @@ export const useChat = (activeContactId: string | null) => {
     setIsLoadingOlder(val);
   }
 
-  // Handle incoming websocket events
   useEffect(() => {
     const unsubscribe = subscribe((payload: IncomingWebSocketPayload) => {
       const contactId = activeContactIdRef.current;
@@ -190,13 +208,19 @@ export const useChat = (activeContactId: string | null) => {
 
       if (payload.type === "message") {
         const msg = payload.data;
+        console.info("[chat:message] websocket message received", {
+          id: msg._id,
+          senderId: msg.senderId,
+          receiverId: msg.receiverId,
+          status: msg.status,
+          deletedForCurrentUser: msg.deletedFor?.includes(currentUserId),
+        });
         const isCurrentConversation =
           (String(msg.senderId) === String(currentUserId) && String(msg.receiverId) === String(contactId)) ||
           (String(msg.senderId) === String(contactId) && String(msg.receiverId) === String(currentUserId));
 
         if (isCurrentConversation) {
           setMessages((prev) => {
-            // Check if there is an optimistic temp message matching this content
             const tempIdx = prev.findIndex(
               (m) =>
                 m._id.startsWith("temp-") &&
@@ -216,7 +240,6 @@ export const useChat = (activeContactId: string | null) => {
             return [...prev, msg];
           });
 
-          // If incoming from active contact and tab is currently visible, mark read immediately
           if (String(msg.senderId) === String(contactId) && String(msg.receiverId) === String(currentUserId)) {
             if (
               typeof document !== "undefined" &&
@@ -266,7 +289,6 @@ export const useChat = (activeContactId: string | null) => {
     };
   }, [subscribe, currentUserId, sendReadWs, setUnreadTotal, clearUnreadForContact]);
 
-  // Send message with instant optimistic update
   const sendMessage = async (content: string) => {
     if (!activeContactId || !content.trim() || !currentUserId) return;
 
@@ -285,19 +307,34 @@ export const useChat = (activeContactId: string | null) => {
       deletedFor: [],
     };
 
-    // Optimistically insert message immediately so UI shows single tick instantly
     setMessages((prev) => [...prev, optimisticMsg]);
+    console.info("[chat:send] optimistic message shown", {
+      tempId,
+      senderId: currentUserId,
+      receiverId: activeContactId,
+      transport: isConnected ? "websocket" : "http",
+    });
 
     let sentWs = false;
 
     if (isConnected) {
       sentWs = sendMessageWs(activeContactId, trimmed);
+      console.info("[chat:send] websocket frame queued", {
+        tempId,
+        receiverId: activeContactId,
+        queued: sentWs,
+      });
     }
 
     if (!sentWs) {
       try {
         const res = await messageService.sendMessage(activeContactId, trimmed);
         if (res.success && res.data) {
+          console.info("[chat:send] http save confirmed", {
+            tempId,
+            messageId: res.data._id,
+            status: res.data.status,
+          });
           setMessages((prev) => {
             const hasTemp = prev.some((m) => m._id === tempId);
             if (hasTemp) {
@@ -309,7 +346,13 @@ export const useChat = (activeContactId: string | null) => {
         }
       } catch (err: any) {
         console.error("Failed to send message:", err);
-        // Remove optimistic message if send failed
+        console.error("[chat:send] http request failed", {
+          tempId,
+          receiverId: activeContactId,
+          status: err.response?.status,
+          response: err.response?.data,
+          message: err.message,
+        });
         setMessages((prev) => prev.filter((m) => m._id !== tempId));
         setError(err.response?.data?.message || err.message || "Failed to send message");
       }
@@ -322,13 +365,11 @@ export const useChat = (activeContactId: string | null) => {
 
   const deleteForMe = async (messageId: string) => {
     sendDeleteForMeWs(messageId);
-    // Optimistic removal
     setMessages((prev) => prev.filter((m) => m._id !== messageId));
   };
 
   const deleteForEveryone = async (messageId: string) => {
     sendDeleteForEveryoneWs(messageId);
-    // Optimistic removal
     setMessages((prev) => prev.filter((m) => m._id !== messageId));
   };
 

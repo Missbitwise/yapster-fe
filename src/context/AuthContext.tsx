@@ -121,7 +121,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     try {
       const res = await authService.register(data);
       if (res.success && res.data) {
-        // Automatically login after successful registration
         return await login({ email: data.email, password: data.password });
       }
       throw new Error(res.message || "Registration failed");
