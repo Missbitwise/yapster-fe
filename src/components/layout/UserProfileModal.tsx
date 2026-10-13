@@ -99,7 +99,6 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({
   const [selectedAvatar, setSelectedAvatar] = useState<string>("");
   const [saveSuccess, setSaveSuccess] = useState(false);
 
-  // Sync state whenever modal opens or user updates
   useEffect(() => {
     if (user) {
       setName(user.name || "");
@@ -155,7 +154,7 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({
       maxWidth={isEditing ? "md" : "sm"}
     >
       {!isEditing ? (
-        /* View Profile Mode */
+
         <div className="flex flex-col items-center text-center space-y-4 pt-2">
           <Avatar
             src={user.profile_picture}
@@ -192,7 +191,7 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({
             </div>
           </div>
 
-          {/* Action Buttons */}
+
           <div className="w-full space-y-2 pt-2">
             <button
               onClick={() => setIsEditing(true)}
@@ -215,9 +214,9 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({
           </div>
         </div>
       ) : (
-        /* Edit Profile Mode */
+
         <form onSubmit={handleSave} className="space-y-4 pt-1 max-h-[75vh] overflow-y-auto px-1">
-          {/* Avatar Picker Section */}
+
           <div>
             <label className="block text-xs font-semibold text-slate-300 mb-2">
               Choose Profile Icon
@@ -273,7 +272,7 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({
             </div>
           </div>
 
-          {/* Name Field */}
+
           <div>
             <label className="block text-xs font-semibold text-slate-300 mb-1">
               Full Name
@@ -291,7 +290,7 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({
             </div>
           </div>
 
-          {/* Username Field */}
+
           <div>
             <label className="block text-xs font-semibold text-slate-300 mb-1">
               Username
@@ -309,7 +308,7 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({
             </div>
           </div>
 
-          {/* Email Field */}
+
           <div>
             <label className="block text-xs font-semibold text-slate-300 mb-1">
               Email Address
@@ -327,7 +326,7 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({
             </div>
           </div>
 
-          {/* Bio Field */}
+
           <div>
             <label className="block text-xs font-semibold text-slate-300 mb-1">
               Bio
@@ -347,13 +346,13 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({
             </div>
           </div>
 
-          {/* Joined Yapster specific date banner */}
+
           <div className="flex items-center gap-2 p-2.5 rounded-xl bg-surface-100/40 border border-card-border/50 text-[11px] text-slate-400">
             <Calendar className="w-3.5 h-3.5 text-brand-light shrink-0" />
             <span>Joined Yapster on {joinDate}</span>
           </div>
 
-          {/* Save / Cancel Action Buttons */}
+
           <div className="flex items-center gap-2 pt-2">
             <button
               type="button"
