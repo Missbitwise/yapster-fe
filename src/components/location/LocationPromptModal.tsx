@@ -37,7 +37,6 @@ export const LocationPromptModal: React.FC<LocationPromptModalProps> = ({
           const lat = position.coords.latitude;
           const lng = position.coords.longitude;
 
-          // Attempt reverse geocoding to obtain the user's city or locality
           let locality = "Nearby";
           try {
             const geocodeRes = await fetch(
@@ -108,7 +107,7 @@ export const LocationPromptModal: React.FC<LocationPromptModalProps> = ({
       maxWidth="md"
     >
       <div className="space-y-4 text-center">
-        {/* Radar Icon with glowing halo */}
+
         <div className="mx-auto w-16 h-16 rounded-full bg-brand/20 border border-brand/40 flex items-center justify-center text-brand-light shadow-glow">
           <Navigation className="w-8 h-8 animate-pulse text-brand" />
         </div>
