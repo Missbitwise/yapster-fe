@@ -130,7 +130,7 @@ export const NearbyRadar: React.FC<NearbyRadarProps> = ({
 
   return (
     <div className="flex flex-col h-full bg-surface-300 p-4 sm:p-6 overflow-y-auto">
-      {/* Top Banner / Hero */}
+
       <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-card via-surface-100 to-card border border-card-border p-6 shadow-xl mb-6">
         <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
@@ -152,7 +152,7 @@ export const NearbyRadar: React.FC<NearbyRadarProps> = ({
             )}
           </div>
 
-          {/* Action buttons */}
+
           <div className="flex flex-wrap items-center gap-2.5">
             <button
               onClick={detectLocation}
@@ -177,7 +177,7 @@ export const NearbyRadar: React.FC<NearbyRadarProps> = ({
         </div>
       </div>
 
-      {/* Manual Coordinates Form if toggled */}
+
       {showManualForm && (
         <form
           onSubmit={handleManualLocationSubmit}
@@ -218,7 +218,7 @@ export const NearbyRadar: React.FC<NearbyRadarProps> = ({
         </form>
       )}
 
-      {/* Radius Controls Bar */}
+
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-surface-200/80 border border-card-border rounded-2xl px-4 py-3 mb-6">
         <div className="flex items-center gap-2 text-xs font-medium text-slate-300">
           <Sliders className="w-4 h-4 text-brand-light" />
@@ -250,7 +250,7 @@ export const NearbyRadar: React.FC<NearbyRadarProps> = ({
         </div>
       </div>
 
-      {/* Error / Alert notice */}
+
       {error && (
         <div className="bg-amber-950/40 border border-amber-700/50 rounded-2xl p-4 text-xs text-amber-200 mb-6 flex items-center justify-between">
           <span>{error}</span>
@@ -263,7 +263,7 @@ export const NearbyRadar: React.FC<NearbyRadarProps> = ({
         </div>
       )}
 
-      {/* Nearby Users Grid */}
+
       {isLoading ? (
         <div className="flex flex-col items-center justify-center py-20 text-slate-400">
           <Loader2 className="w-8 h-8 animate-spin text-brand mb-2" />
@@ -387,7 +387,7 @@ export const NearbyRadar: React.FC<NearbyRadarProps> = ({
         </div>
       )}
 
-      {/* Block Confirmation Modal */}
+
       <BlockUserModal
         isOpen={!!userToBlock}
         onClose={() => setUserToBlock(null)}
