@@ -54,7 +54,7 @@ export const FriendRequestsModal: React.FC<FriendRequestsModalProps> = ({
       title="Friend Requests"
       maxWidth="md"
     >
-      {/* Tab Switcher: Received vs Sent */}
+
       <div className="flex items-center gap-2 p-1 bg-surface-100 rounded-2xl border border-card-border mb-4">
         <button
           type="button"
@@ -105,10 +105,10 @@ export const FriendRequestsModal: React.FC<FriendRequestsModalProps> = ({
         </button>
       </div>
 
-      {/* Content Area */}
+
       <div className="space-y-3 max-h-[58vh] overflow-y-auto pr-1">
         {activeTab === "received" ? (
-          /* Received Requests Tab */
+
           requests.length === 0 ? (
             <div className="text-center py-12 text-slate-400">
               <Inbox className="w-10 h-10 mx-auto mb-2 text-slate-600" />
@@ -175,7 +175,7 @@ export const FriendRequestsModal: React.FC<FriendRequestsModalProps> = ({
             ))
           )
         ) : (
-          /* Sent Requests Tab */
+
           sentRequests.length === 0 ? (
             <div className="text-center py-12 text-slate-400">
               <Send className="w-10 h-10 mx-auto mb-2 text-slate-600" />
