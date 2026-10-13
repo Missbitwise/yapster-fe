@@ -88,11 +88,13 @@ export const FriendsTab: React.FC<FriendsTabProps> = ({
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {filtered.map((friend) => {
             const presence = presenceMap[friend.id];
-            const isBlockedBy = Boolean(
-              friend.is_blocked_by || presence?.isBlockedBy
+            const isPresenceHidden = Boolean(
+              presence?.isHidden !== undefined
+                ? presence.isHidden
+                : friend.is_blocked || friend.is_blocked_by || presence?.isBlockedBy
             );
-            const isOnline = isBlockedBy ? false : presence?.status === "online";
-            const lastSeen = isBlockedBy
+            const isOnline = isPresenceHidden ? false : presence?.status === "online";
+            const lastSeen = isPresenceHidden
               ? null
               : presence?.lastSeen !== undefined
               ? presence.lastSeen
@@ -109,7 +111,7 @@ export const FriendsTab: React.FC<FriendsTabProps> = ({
                       src={friend.profile_picture}
                       name={friend.name}
                       size="lg"
-                      isOnline={isBlockedBy ? false : isOnline}
+                      isOnline={isPresenceHidden ? undefined : isOnline}
                       ringColor="purple"
                     />
                     <div className="min-w-0">
@@ -119,7 +121,7 @@ export const FriendsTab: React.FC<FriendsTabProps> = ({
                       <p className="text-xs text-slate-400 truncate">
                         @{friend.username}
                       </p>
-                      {!isBlockedBy && (
+                      {!isPresenceHidden && (
                         <span className="text-[11px] font-medium text-slate-400">
                           {isOnline ? (
                             <span className="text-emerald-400 font-semibold">
@@ -157,7 +159,7 @@ export const FriendsTab: React.FC<FriendsTabProps> = ({
         </div>
       )}
 
-      {/* Block Confirmation Modal */}
+
       <BlockUserModal
         isOpen={!!userToBlock}
         onClose={() => setUserToBlock(null)}
