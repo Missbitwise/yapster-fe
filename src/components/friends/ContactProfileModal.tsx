@@ -33,7 +33,8 @@ export const ContactProfileModal: React.FC<ContactProfileModalProps> = ({
   if (!contact) return null;
 
   const joinDateFormatted = formatJoinDate(contact.created_at || contact.friends_since);
-  const effectiveOnline = !isBlockedBy && isOnline;
+  const hidePresence = isBlocked || isBlockedBy;
+  const effectiveOnline = !hidePresence && isOnline;
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} title="User Profile" maxWidth="sm">
@@ -44,7 +45,7 @@ export const ContactProfileModal: React.FC<ContactProfileModalProps> = ({
             name={contact.name}
             size="xl"
             ringColor="purple"
-            isOnline={effectiveOnline}
+            isOnline={hidePresence ? undefined : effectiveOnline}
           />
         </div>
 
@@ -58,9 +59,7 @@ export const ContactProfileModal: React.FC<ContactProfileModalProps> = ({
           </div>
 
           <div className="mt-1.5 flex items-center justify-center gap-1.5 text-[11px]">
-            {isBlockedBy ? (
-              <span className="text-slate-400">Offline</span>
-            ) : effectiveOnline ? (
+            {hidePresence ? null : effectiveOnline ? (
               <span className="text-emerald-400 font-semibold flex items-center gap-1">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
                 Online Now
@@ -78,7 +77,7 @@ export const ContactProfileModal: React.FC<ContactProfileModalProps> = ({
           </div>
         </div>
 
-        {/* Bio Section - Only displayed when other user views profile */}
+
         <div className="w-full">
           <div className="text-left text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-1.5 px-1">
             Bio
@@ -94,7 +93,7 @@ export const ContactProfileModal: React.FC<ContactProfileModalProps> = ({
           )}
         </div>
 
-        {/* User Details */}
+
         <div className="w-full space-y-2 pt-2 text-xs text-left border-t border-card-border/60">
           <div className="flex items-center gap-2.5 p-2.5 rounded-xl bg-surface-100/60 text-slate-300">
             <Calendar className="w-4 h-4 text-brand-light shrink-0" />
@@ -102,7 +101,7 @@ export const ContactProfileModal: React.FC<ContactProfileModalProps> = ({
           </div>
         </div>
 
-        {/* Actions */}
+
         <div className="w-full space-y-2 pt-2">
           {onSendMessage && (
             <button
