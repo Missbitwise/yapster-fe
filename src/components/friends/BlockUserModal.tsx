@@ -36,7 +36,7 @@ export const BlockUserModal: React.FC<BlockUserModalProps> = ({
   return (
     <Modal isOpen={isOpen} onClose={onClose} title="Block User" maxWidth="sm">
       <div className="flex flex-col items-center text-center space-y-4 pt-1">
-        {/* Warning Icon Badge */}
+
         <div className="w-14 h-14 rounded-2xl bg-rose-500/15 border border-rose-500/30 flex items-center justify-center text-rose-400 shadow-glow-sm">
           <ShieldAlert className="w-7 h-7" />
         </div>
@@ -50,7 +50,7 @@ export const BlockUserModal: React.FC<BlockUserModalProps> = ({
           </p>
         </div>
 
-        {/* Action Buttons */}
+
         <div className="w-full flex items-center gap-2 pt-2 border-t border-card-border/60">
           <button
             type="button"
