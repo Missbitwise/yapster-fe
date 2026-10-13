@@ -67,7 +67,7 @@ export const SidebarNav: React.FC<SidebarNavProps> = ({
 
   return (
     <aside className="w-16 sm:w-20 bg-surface-400 border-r border-card-border/80 flex flex-col items-center justify-between py-5 shrink-0 z-30 select-none">
-      {/* Brand Icon */}
+
       <div className="flex flex-col items-center gap-6">
         <div
           onClick={() => onSelectTab("chats")}
@@ -81,7 +81,7 @@ export const SidebarNav: React.FC<SidebarNavProps> = ({
           </div>
         </div>
 
-        {/* Navigation Items */}
+
         <nav className="flex flex-col items-center gap-3">
           {navItems.map((item) => {
             const Icon = item.icon;
@@ -111,7 +111,7 @@ export const SidebarNav: React.FC<SidebarNavProps> = ({
         </nav>
       </div>
 
-      {/* Bottom Profile & Logout */}
+
       <div className="flex flex-col items-center gap-3">
         <button
           onClick={onOpenProfile}
