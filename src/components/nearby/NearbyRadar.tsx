@@ -7,6 +7,7 @@ import { Friend, FriendRequest } from "@/types/friend.types";
 import { useToast } from "@/context/ToastContext";
 import {
   Compass,
+  Globe2,
   MapPin,
   Navigation,
   UserPlus,
@@ -26,6 +27,7 @@ interface NearbyRadarProps {
   onCancelFriendRequest?: (requestIdOrUserId: string) => Promise<any>;
   onBlockUser: (userId: string) => Promise<any>;
   isBlocked?: (userId: string) => boolean;
+  receivedRequests?: FriendRequest[];
 }
 
 export const NearbyRadar: React.FC<NearbyRadarProps> = ({
@@ -36,18 +38,28 @@ export const NearbyRadar: React.FC<NearbyRadarProps> = ({
   onCancelFriendRequest,
   onBlockUser,
   isBlocked,
+  receivedRequests = [],
 }) => {
   const {
     radius,
     setRadius,
     nearbyUsers,
+    everyoneUsers,
+    everyonePage,
+    hasMoreEveryone,
     isLoading,
+    isLoadingEveryone,
+    isLoadingLocation,
     isUpdatingLocation,
     error,
+    locationError,
+    hasLocation,
     currentLocality,
     detectLocation,
+    refreshLocation,
     updateLocation,
     fetchNearby,
+    fetchEveryone,
   } = useNearby(10);
 
   const { showToast } = useToast();
@@ -55,6 +67,7 @@ export const NearbyRadar: React.FC<NearbyRadarProps> = ({
   const [manualLng, setManualLng] = useState("");
   const [manualCity, setManualCity] = useState("");
   const [showManualForm, setShowManualForm] = useState(false);
+  const [discoveryMode, setDiscoveryMode] = useState<"nearby" | "everyone">("nearby");
   const [requestedUserIds, setRequestedUserIds] = useState<Set<string>>(
     new Set()
   );
@@ -70,9 +83,16 @@ export const NearbyRadar: React.FC<NearbyRadarProps> = ({
     return map;
   }, [sentRequests]);
 
-  const visibleNearbyUsers = React.useMemo(() => {
-    return nearbyUsers.filter((u) => !isBlocked?.(u.id));
-  }, [nearbyUsers, isBlocked]);
+  const receivedRequestIds = React.useMemo(
+    () => new Set(receivedRequests.map((request) => request.sender_id).filter(Boolean)),
+    [receivedRequests]
+  );
+
+  const visibleUsers = React.useMemo(() => {
+    const users = discoveryMode === "nearby" ? nearbyUsers : everyoneUsers;
+    return users.filter((user) => !isBlocked?.(user.id));
+  }, [discoveryMode, nearbyUsers, everyoneUsers, isBlocked]);
+  const visibleError = error || (discoveryMode === "nearby" ? locationError : null);
 
   const handleCancelRequest = async (userId: string, userName: string) => {
     if (!onCancelFriendRequest) return;
@@ -124,8 +144,15 @@ export const NearbyRadar: React.FC<NearbyRadarProps> = ({
       alert("Please enter valid latitude and longitude numbers");
       return;
     }
-    await updateLocation(lat, lng, manualCity || "Custom Location");
-    setShowManualForm(false);
+    try {
+      await updateLocation(lat, lng, manualCity || undefined);
+      setShowManualForm(false);
+      setManualLat("");
+      setManualLng("");
+      setManualCity("");
+    } catch {
+      return;
+    }
   };
 
   return (
@@ -136,13 +163,15 @@ export const NearbyRadar: React.FC<NearbyRadarProps> = ({
           <div>
             <div className="flex items-center gap-2 text-brand-light text-xs font-semibold uppercase tracking-wider mb-1">
               <Compass className="w-4 h-4 animate-spin-slow text-brand" />
-              <span>People In Your Area</span>
+              <span>{discoveryMode === "nearby" ? "People In Your Area" : "Yapster Community"}</span>
             </div>
             <h2 className="text-xl sm:text-2xl font-bold text-white">
-              Discover Friends Nearby
+              {discoveryMode === "nearby" ? "Discover Friends Nearby" : "Discover Everyone"}
             </h2>
             <p className="text-xs sm:text-sm text-slate-400 mt-1 max-w-md">
-              Find friendly people around your neighborhood or city. Connect and start chatting!
+              {discoveryMode === "nearby"
+                ? "Find friendly people around your neighborhood or city. Connect and start chatting!"
+                : "Explore people across cities and regions, wherever they are."}
             </p>
             {currentLocality && (
               <div className="flex items-center gap-1.5 mt-2.5 text-xs text-emerald-400">
@@ -154,31 +183,55 @@ export const NearbyRadar: React.FC<NearbyRadarProps> = ({
 
 
           <div className="flex flex-wrap items-center gap-2.5">
-            <button
-              onClick={detectLocation}
-              disabled={isUpdatingLocation}
-              className="flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-brand  text-white text-xs font-semibold  transition-all disabled:opacity-50"
-            >
-              {isUpdatingLocation ? (
-                <Loader2 className="w-4 h-4 animate-spin" />
-              ) : (
-                <Navigation className="w-4 h-4" />
-              )}
-              <span>{isUpdatingLocation ? "Finding Your Area..." : "Update My Location"}</span>
-            </button>
+            <div className="inline-flex rounded-2xl border border-card-border bg-surface-100 p-1" role="tablist" aria-label="Discovery mode">
+              <button
+                role="tab"
+                aria-selected={discoveryMode === "nearby"}
+                onClick={() => {
+                  setDiscoveryMode("nearby");
+                  if (hasLocation) void fetchNearby(radius);
+                }}
+                className={`flex items-center gap-1.5 rounded-xl px-3 py-2 text-xs font-semibold transition-colors ${discoveryMode === "nearby" ? "bg-brand text-white" : "text-slate-300"}`}
+              >
+                <Compass className="h-3.5 w-3.5" /> Nearby
+              </button>
+              <button
+                role="tab"
+                aria-selected={discoveryMode === "everyone"}
+                onClick={() => {
+                  setDiscoveryMode("everyone");
+                  if (everyonePage === 0) void fetchEveryone(1);
+                }}
+                className={`flex items-center gap-1.5 rounded-xl px-3 py-2 text-xs font-semibold transition-colors ${discoveryMode === "everyone" ? "bg-brand text-white" : "text-slate-300"}`}
+              >
+                <Globe2 className="h-3.5 w-3.5" /> Everyone
+              </button>
+            </div>
 
-            <button
-              onClick={() => setShowManualForm(!showManualForm)}
-              className="px-3.5 py-2.5 rounded-2xl bg-surface-100 border border-card-border  text-slate-300  text-xs font-medium transition-colors"
-            >
-              Set City Manually
-            </button>
+            {discoveryMode === "nearby" && (
+              <>
+                <button
+                  onClick={() => void detectLocation().catch(() => undefined)}
+                  disabled={isUpdatingLocation}
+                  className="flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-brand text-white text-xs font-semibold transition-all disabled:opacity-50"
+                >
+                  {isUpdatingLocation ? <Loader2 className="w-4 h-4 animate-spin" /> : <Navigation className="w-4 h-4" />}
+                  <span>{isUpdatingLocation ? "Finding Your Area..." : hasLocation ? "Update My Location" : "Enable Location"}</span>
+                </button>
+                <button
+                  onClick={() => setShowManualForm(!showManualForm)}
+                  className="px-3.5 py-2.5 rounded-2xl bg-surface-100 border border-card-border text-slate-300 text-xs font-medium transition-colors"
+                >
+                  Set City Manually
+                </button>
+              </>
+            )}
           </div>
         </div>
       </div>
 
 
-      {showManualForm && (
+      {showManualForm && discoveryMode === "nearby" && (
         <form
           onSubmit={handleManualLocationSubmit}
           className="bg-card border border-card-border rounded-2xl p-4 mb-6 grid grid-cols-1 sm:grid-cols-4 gap-3 animate-in fade-in"
@@ -219,7 +272,7 @@ export const NearbyRadar: React.FC<NearbyRadarProps> = ({
       )}
 
 
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-surface-200/80 border border-card-border rounded-2xl px-4 py-3 mb-6">
+      {discoveryMode === "nearby" && <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-surface-200/80 border border-card-border rounded-2xl px-4 py-3 mb-6">
         <div className="flex items-center gap-2 text-xs font-medium text-slate-300">
           <Sliders className="w-4 h-4 text-brand-light" />
           <span>Find people within:</span>
@@ -249,37 +302,61 @@ export const NearbyRadar: React.FC<NearbyRadarProps> = ({
           </button>
         </div>
       </div>
+      }
 
 
-      {error && (
+      {visibleError && (
         <div className="bg-amber-950/40 border border-amber-700/50 rounded-2xl p-4 text-xs text-amber-200 mb-6 flex items-center justify-between">
-          <span>{error}</span>
-          <button
-            onClick={detectLocation}
-            className="underline  font-semibold ml-2"
-          >
-            Enable Location
-          </button>
+          <span>{visibleError}</span>
+          {(
+            discoveryMode === "everyone" ||
+            (discoveryMode === "nearby" && (!hasLocation || Boolean(visibleError)))
+          ) && (
+            <button
+              onClick={() => {
+                if (discoveryMode === "everyone") {
+                  void fetchEveryone(everyonePage > 0 ? everyonePage + 1 : 1, everyonePage > 0);
+                } else if (hasLocation) {
+                  void fetchNearby(radius);
+                } else {
+                  void refreshLocation();
+                }
+              }}
+              className="underline font-semibold ml-2"
+            >
+              Retry
+            </button>
+          )}
         </div>
       )}
 
 
-      {isLoading ? (
+      {((discoveryMode === "nearby" && isLoadingLocation) || (discoveryMode === "nearby" ? isLoading : isLoadingEveryone)) ? (
         <div className="flex flex-col items-center justify-center py-20 text-slate-400">
           <Loader2 className="w-8 h-8 animate-spin text-brand mb-2" />
-          <p className="text-xs">Scanning for people nearby within {radius} km...</p>
+          <p className="text-xs">{discoveryMode === "nearby" && isLoadingLocation ? "Loading your saved location..." : discoveryMode === "nearby" ? `Scanning within ${radius} km...` : "Loading Yapster users..."}</p>
         </div>
-      ) : visibleNearbyUsers.length === 0 ? (
+      ) : discoveryMode === "nearby" && !hasLocation ? (
         <div className="flex flex-col items-center justify-center py-20 text-center text-slate-400 bg-surface-200/40 border border-card-border/60 rounded-3xl p-8">
-          <Compass className="w-12 h-12 text-slate-600 mb-3" />
+          <MapPin className="w-12 h-12 text-slate-600 mb-3" />
+          <h3 className="text-base font-semibold text-white mb-1">Share your location to find nearby people</h3>
+          <p className="text-xs max-w-sm mb-4">Your saved location is loaded from your Yapster account and stays available when you move between screens.</p>
+          <button onClick={() => void detectLocation().catch(() => undefined)} disabled={isUpdatingLocation} className="px-4 py-2 rounded-xl bg-brand text-white text-xs font-semibold disabled:opacity-50">
+            {isUpdatingLocation ? "Getting location..." : "Use my current location"}
+          </button>
+        </div>
+      ) : visibleUsers.length === 0 ? (
+        <div className="flex flex-col items-center justify-center py-20 text-center text-slate-400 bg-surface-200/40 border border-card-border/60 rounded-3xl p-8">
+          {discoveryMode === "nearby" ? <Compass className="w-12 h-12 text-slate-600 mb-3" /> : <Globe2 className="w-12 h-12 text-slate-600 mb-3" />}
           <h3 className="text-base font-semibold text-white mb-1">
-            No users detected within {radius} km
+            {discoveryMode === "nearby" ? `No users detected within ${radius} km` : "No other users found"}
           </h3>
           <p className="text-xs max-w-sm mb-4">
-            Try expanding the search radius slider or invite friends in your area to
-            register and share their location!
+            {discoveryMode === "nearby"
+              ? "Try expanding the search radius slider or invite people in your area to share their location."
+              : "There are no other discoverable Yapster users right now."}
           </p>
-          <button
+          {discoveryMode === "nearby" && <button
             onClick={() => {
               setRadius(50);
               fetchNearby(50);
@@ -287,13 +364,18 @@ export const NearbyRadar: React.FC<NearbyRadarProps> = ({
             className="px-4 py-2 rounded-xl bg-surface-100 border border-card-border text-xs text-brand-light   transition-colors"
           >
             Expand to 50 km
-          </button>
+          </button>}
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {visibleNearbyUsers.map((user) => {
-              const isAlreadyFriend = friendIdSet.has(user.id);
-              const isRequested = requestedUserIds.has(user.id) || sentRequestMap.has(user.id);
+          {visibleUsers.map((user) => {
+              const isAlreadyFriend = friendIdSet.has(user.id) || user.relationship_status === "friend";
+              const isRequested = requestedUserIds.has(user.id) || sentRequestMap.has(user.id) || user.relationship_status === "request_sent";
+              const hasReceivedRequest = receivedRequestIds.has(user.id) || user.relationship_status === "request_received";
+              const locality = user.locality?.trim();
+              const hasDisplayableLocality = Boolean(
+                locality && !["current location", "nearby", "my city", "custom location"].includes(locality.toLowerCase())
+              );
 
               return (
                 <div
@@ -311,7 +393,9 @@ export const NearbyRadar: React.FC<NearbyRadarProps> = ({
 
                     <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-brand/15 text-brand-light border border-brand/30">
                       <MapPin className="w-3 h-3" />
-                      {user.distance_km} km
+                      {discoveryMode === "nearby" && "distance_km" in user
+                        ? `${user.distance_km} km`
+                        : hasDisplayableLocality ? locality : "Location not provided"}
                     </span>
                   </div>
 
@@ -322,7 +406,7 @@ export const NearbyRadar: React.FC<NearbyRadarProps> = ({
                     @{user.username}
                   </p>
 
-                  {user.locality && (
+                  {discoveryMode === "nearby" && user.locality && (
                     <p className="text-xs text-slate-300 flex items-center gap-1 mb-2">
                       <span className="text-slate-500">Area:</span>
                       <span>{user.locality}</span>
@@ -354,6 +438,10 @@ export const NearbyRadar: React.FC<NearbyRadarProps> = ({
                       <MessageCircle className="w-3.5 h-3.5" />
                       <span>Chat</span>
                     </button>
+                  ) : hasReceivedRequest ? (
+                    <button disabled className="flex-1 rounded-xl border border-card-border bg-surface-100 px-3 py-2 text-xs font-semibold text-slate-400">
+                      Request Received · Check Requests
+                    </button>
                   ) : isRequested ? (
                     <button
                       onClick={() => handleCancelRequest(user.id, user.name)}
@@ -384,6 +472,18 @@ export const NearbyRadar: React.FC<NearbyRadarProps> = ({
               </div>
             );
           })}
+        </div>
+      )}
+
+      {discoveryMode === "everyone" && hasMoreEveryone && (
+        <div className="flex justify-center py-6">
+          <button
+            onClick={() => void fetchEveryone(everyonePage + 1, true)}
+            disabled={isLoadingEveryone}
+            className="rounded-xl border border-card-border bg-surface-100 px-5 py-2.5 text-xs font-semibold text-slate-200 disabled:opacity-50"
+          >
+            {isLoadingEveryone ? "Loading..." : "Load more people"}
+          </button>
         </div>
       )}
 

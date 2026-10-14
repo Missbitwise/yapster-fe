@@ -1,142 +1,115 @@
 "use client";
 
 import { useState, useCallback, useEffect } from "react";
-import { NearbyUser } from "@/types/location.types";
 import { locationService } from "@/services/location.service";
 import { useAuth } from "@/context/AuthContext";
+import { useLocation } from "@/context/LocationContext";
+import { DiscoveredUser, NearbyUser } from "@/types/location.types";
 
 export const useNearby = (initialRadius: number = 10) => {
   const { isAuthenticated } = useAuth();
+  const {
+    savedLocation,
+    hasLocation,
+    isLoadingLocation,
+    isUpdatingLocation,
+    locationError,
+    updateLocation,
+    detectLocation,
+    refreshLocation,
+  } = useLocation();
   const [radius, setRadius] = useState<number>(initialRadius);
   const [nearbyUsers, setNearbyUsers] = useState<NearbyUser[]>([]);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [isUpdatingLocation, setIsUpdatingLocation] = useState<boolean>(false);
-  const [error, setError] = useState<string | null>(null);
-  const [hasLocation, setHasLocation] = useState<boolean>(false);
-  const [currentLocality, setCurrentLocality] = useState<string>("");
+  const [everyoneUsers, setEveryoneUsers] = useState<DiscoveredUser[]>([]);
+  const [everyonePage, setEveryonePage] = useState(0);
+  const [hasMoreEveryone, setHasMoreEveryone] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isLoadingEveryone, setIsLoadingEveryone] = useState(false);
+  const [discoveryError, setDiscoveryError] = useState<string | null>(null);
 
   const fetchNearby = useCallback(
     async (searchRadius?: number) => {
-      if (!isAuthenticated) return;
-      const r = searchRadius ?? radius;
+      if (!isAuthenticated || isLoadingLocation) return;
+      if (!hasLocation) {
+        setNearbyUsers([]);
+        return;
+      }
+
       setIsLoading(true);
-      setError(null);
+      setDiscoveryError(null);
       try {
-        const res = await locationService.getNearbyUsers(r);
-        if (res.success && Array.isArray(res.data)) {
-          setNearbyUsers(res.data);
-          setHasLocation(true);
+        const response = await locationService.getNearbyUsers(searchRadius ?? radius);
+        if (response.success && Array.isArray(response.data)) {
+          setNearbyUsers(response.data);
         }
-      } catch (err: any) {
-        console.warn("Nearby fetch:", err.response?.data?.message || err.message);
-        setError(
-          err.response?.data?.message ||
-            "Please update your location to discover nearby friends."
+      } catch (error: any) {
+        setDiscoveryError(
+          error.response?.data?.message || "Could not load nearby users. Please try again."
         );
       } finally {
         setIsLoading(false);
       }
     },
-    [isAuthenticated, radius]
+    [hasLocation, isAuthenticated, isLoadingLocation, radius]
   );
 
-  const updateLocation = async (
-    lat: number,
-    lng: number,
-    localityName?: string
-  ) => {
-    setIsUpdatingLocation(true);
-    setError(null);
-    try {
-      const res = await locationService.updateLocation({
-        latitude: lat,
-        longitude: lng,
-        locality: localityName || undefined,
-      });
-      if (res.success) {
-        setHasLocation(true);
-        if (localityName) setCurrentLocality(localityName);
-        await fetchNearby();
-      }
-      return res;
-    } catch (err: any) {
-      setError(err.response?.data?.message || "Failed to update location");
-      throw err;
-    } finally {
-      setIsUpdatingLocation(false);
-    }
-  };
-
-  const detectLocation = useCallback(async () => {
-    if (typeof window === "undefined" || !navigator.geolocation) {
-      setError("Geolocation is not supported by your browser");
-      return;
-    }
-
-    setIsUpdatingLocation(true);
-    setError(null);
-
-    navigator.geolocation.getCurrentPosition(
-      async (position) => {
-        try {
-          const lat = position.coords.latitude;
-          const lng = position.coords.longitude;
-
-          let locality = "Current Location";
-          try {
-            const geocodeRes = await fetch(
-              `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json`
-            );
-            if (geocodeRes.ok) {
-              const geoData = await geocodeRes.json();
-              locality =
-                geoData.address?.city ||
-                geoData.address?.town ||
-                geoData.address?.suburb ||
-                geoData.address?.state ||
-                "Nearby";
-            }
-          } catch {
-            locality = "My City";
-          }
-
-          await updateLocation(lat, lng, locality);
-        } catch (err: any) {
-          setError(err.message || "Failed to save location");
-          setIsUpdatingLocation(false);
-        }
-      },
-      (geoError) => {
-        setIsUpdatingLocation(false);
-        if (geoError.code === geoError.PERMISSION_DENIED) {
-          setError(
-            "Location permission was denied. You can still set custom coordinates or enable permissions in browser."
+  const fetchEveryone = useCallback(
+    async (page: number = 1, append: boolean = false) => {
+      if (!isAuthenticated) return;
+      setIsLoadingEveryone(true);
+      setDiscoveryError(null);
+      try {
+        const response = await locationService.getEveryone(page);
+        if (response.success && response.data) {
+          setEveryoneUsers((previous) =>
+            append
+              ? [
+                  ...previous,
+                  ...response.data.users.filter(
+                    (user) => !previous.some((existing) => existing.id === user.id)
+                  ),
+                ]
+              : response.data.users
           );
-        } else {
-          setError("Failed to get current GPS location: " + geoError.message);
+          setEveryonePage(response.data.page);
+          setHasMoreEveryone(response.data.hasMore);
         }
-      },
-      { timeout: 10000, enableHighAccuracy: true }
-    );
-  }, []);
+      } catch (error: any) {
+        setDiscoveryError(
+          error.response?.data?.message || "Could not load users. Please try again."
+        );
+      } finally {
+        setIsLoadingEveryone(false);
+      }
+    },
+    [isAuthenticated]
+  );
 
   useEffect(() => {
-    if (isAuthenticated) {
-      fetchNearby();
+    if (isAuthenticated && hasLocation && !isLoadingLocation) {
+      void fetchNearby();
     }
-  }, [isAuthenticated, fetchNearby]);
+  }, [isAuthenticated, hasLocation, isLoadingLocation, fetchNearby]);
 
   return {
     radius,
     setRadius,
     nearbyUsers,
+    everyoneUsers,
+    everyonePage,
+    hasMoreEveryone,
     isLoading,
+    isLoadingEveryone,
+    isLoadingLocation,
     isUpdatingLocation,
-    error,
+    error: discoveryError,
+    locationError,
     hasLocation,
-    currentLocality,
+    currentLocality: savedLocation?.locality || "",
     fetchNearby,
+    fetchEveryone,
     detectLocation,
+    refreshLocation,
     updateLocation,
   };
 };

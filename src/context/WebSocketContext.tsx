@@ -55,7 +55,7 @@ const WS_BASE_URL =
 export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
-  const { token, user } = useAuth();
+  const { user } = useAuth();
   const [isConnected, setIsConnected] = useState<boolean>(false);
   const [presenceMap, setPresenceMap] = useState<
     Record<string, PresenceInfo>
@@ -164,7 +164,7 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({
   );
 
   const connect = useCallback(() => {
-    if (!token || !user) return;
+    if (!user) return;
     if (
       socketRef.current &&
       (socketRef.current.readyState === WebSocket.OPEN ||
@@ -174,8 +174,7 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({
     }
 
     try {
-      const wsUrl = `${WS_BASE_URL}?token=${encodeURIComponent(token)}`;
-      const ws = new WebSocket(wsUrl);
+      const ws = new WebSocket(WS_BASE_URL);
       socketRef.current = ws;
 
       ws.onopen = () => {
@@ -283,7 +282,7 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({
         setIsConnected(false);
         socketRef.current = null;
 
-        if (event.code !== 1000 && event.code !== 1008 && token) {
+        if (event.code !== 1000 && event.code !== 1008 && user) {
           const backoff = Math.min(
             1000 * Math.pow(1.5, reconnectAttemptRef.current),
             10000
@@ -301,10 +300,10 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({
     } catch (err) {
       console.error("Failed to initialize WebSocket:", err);
     }
-  }, [token, user]);
+  }, [user]);
 
   useEffect(() => {
-    if (token && user) {
+    if (user) {
       connect();
       messageService
         .getUnreadSummary()
@@ -338,7 +337,7 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({
         socketRef.current = null;
       }
     };
-  }, [token, user, connect]);
+  }, [user, connect]);
 
   return (
     <WebSocketContext.Provider

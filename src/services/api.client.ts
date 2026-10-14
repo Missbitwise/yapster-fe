@@ -1,4 +1,4 @@
-import axios, { AxiosError, InternalAxiosRequestConfig } from "axios";
+import axios, { AxiosError } from "axios";
 
 const API_BASE_URL =
   process.env.NEXT_PUBLIC_API_URL || "https://yapster-be.onrender.com/api";
@@ -11,21 +11,6 @@ export const apiClient = axios.create({
   withCredentials: true,
 });
 
-apiClient.interceptors.request.use(
-  (config: InternalAxiosRequestConfig) => {
-    if (typeof window !== "undefined") {
-      const token = localStorage.getItem("yapster_token");
-      if (token && config.headers) {
-        config.headers.Authorization = `Bearer ${token}`;
-      }
-    }
-    return config;
-  },
-  (error) => {
-    return Promise.reject(error);
-  }
-);
-
 apiClient.interceptors.response.use(
   (response) => response,
   (error: AxiosError) => {
@@ -33,9 +18,8 @@ apiClient.interceptors.response.use(
       if (typeof window !== "undefined") {
         const currentPath = window.location.pathname;
         if (currentPath !== "/login" && currentPath !== "/register") {
-          localStorage.removeItem("yapster_token");
           localStorage.removeItem("yapster_user");
-          window.dispatchEvent(new Event("yapster_auth_change"));
+          window.dispatchEvent(new Event("yapster_auth_expired"));
         }
       }
     }

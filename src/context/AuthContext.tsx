@@ -7,13 +7,12 @@ import React, {
   useState,
   useCallback,
 } from "react";
-import { useRouter, usePathname } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { User, LoginDTO, RegisterDTO } from "@/types/user.types";
 import { authService } from "@/services/auth.service";
 
 interface AuthContextType {
   user: User | null;
-  token: string | null;
   isLoading: boolean;
   isAuthenticated: boolean;
   login: (credentials: LoginDTO) => Promise<User>;
@@ -21,6 +20,12 @@ interface AuthContextType {
   logout: () => void;
   refreshUser: () => Promise<void>;
   updateUserLocally: (updater: Partial<User>) => void;
+  updateProfile: (data: {
+    name: string;
+    username: string;
+    bio: string;
+    profile_picture?: string | null;
+  }) => Promise<User>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -29,84 +34,59 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
   const [user, setUser] = useState<User | null>(null);
-  const [token, setToken] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const router = useRouter();
-  const pathname = usePathname();
 
   const logout = useCallback(() => {
     if (typeof window !== "undefined") {
       localStorage.removeItem("yapster_token");
       localStorage.removeItem("yapster_user");
     }
-    setToken(null);
     setUser(null);
+    authService.logout().catch(() => undefined);
     router.push("/login");
   }, [router]);
 
   const initAuth = useCallback(async () => {
     try {
       if (typeof window === "undefined") return;
-      const storedToken = localStorage.getItem("yapster_token");
-      if (!storedToken) {
-        setIsLoading(false);
-        return;
-      }
-
-      setToken(storedToken);
-      let localUser: Partial<User> | null = null;
-      try {
-        const raw = localStorage.getItem("yapster_user");
-        if (raw) localUser = JSON.parse(raw);
-      } catch {}
-
-      if (localUser && localUser.id) {
-        setUser(localUser as User);
-      }
-
+      localStorage.removeItem("yapster_token");
       const res = await authService.getMe();
       if (res.success && res.data) {
-        const mergedUser = {
-          ...res.data,
-          ...(localUser || {}),
-          id: res.data.id,
-          created_at: res.data.created_at || localUser?.created_at,
-        };
-        setUser(mergedUser);
-        localStorage.setItem("yapster_user", JSON.stringify(mergedUser));
+        setUser(res.data);
+        localStorage.setItem("yapster_user", JSON.stringify(res.data));
       } else {
-        logout();
+        setUser(null);
+        localStorage.removeItem("yapster_user");
       }
     } catch (error) {
-      console.warn("Session restore failed, logging out:", error);
-      logout();
+      setUser(null);
+      if (typeof window !== "undefined") localStorage.removeItem("yapster_user");
     } finally {
       setIsLoading(false);
     }
-  }, [logout]);
+  }, []);
 
   useEffect(() => {
     initAuth();
-
-    const handleAuthChange = () => {
-      initAuth();
-    };
-
-    window.addEventListener("yapster_auth_change", handleAuthChange);
-    return () => {
-      window.removeEventListener("yapster_auth_change", handleAuthChange);
-    };
   }, [initAuth]);
+
+  useEffect(() => {
+    const handleAuthExpired = () => {
+      setUser(null);
+      localStorage.removeItem("yapster_user");
+    };
+    window.addEventListener("yapster_auth_expired", handleAuthExpired);
+    return () => window.removeEventListener("yapster_auth_expired", handleAuthExpired);
+  }, []);
 
   const login = async (credentials: LoginDTO): Promise<User> => {
     setIsLoading(true);
     try {
       const res = await authService.login(credentials);
       if (res.success && res.data) {
-        const { user: loggedInUser, token: receivedToken } = res.data;
-        setToken(receivedToken);
+        const { user: loggedInUser } = res.data;
         setUser(loggedInUser);
-        localStorage.setItem("yapster_token", receivedToken);
         localStorage.setItem("yapster_user", JSON.stringify(loggedInUser));
         return loggedInUser;
       }
@@ -121,7 +101,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     try {
       const res = await authService.register(data);
       if (res.success && res.data) {
-        return await login({ email: data.email, password: data.password });
+        setUser(res.data);
+        localStorage.setItem("yapster_user", JSON.stringify(res.data));
+        return res.data;
       }
       throw new Error(res.message || "Registration failed");
     } finally {
@@ -152,13 +134,30 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     });
   };
 
-  const isAuthenticated = !!token && !!user;
+  const updateProfile = async (data: {
+    name: string;
+    username: string;
+    bio: string;
+    profile_picture?: string | null;
+  }): Promise<User> => {
+    const res = await authService.updateProfile({
+      ...data,
+      username: data.username.trim().toLowerCase(),
+    });
+    if (!res.success || !res.data) {
+      throw new Error(res.message || "Failed to update profile");
+    }
+    setUser(res.data);
+    localStorage.setItem("yapster_user", JSON.stringify(res.data));
+    return res.data;
+  };
+
+  const isAuthenticated = !!user;
 
   return (
     <AuthContext.Provider
       value={{
         user,
-        token,
         isLoading,
         isAuthenticated,
         login,
@@ -166,6 +165,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         logout,
         refreshUser,
         updateUserLocally,
+        updateProfile,
       }}
     >
       {children}

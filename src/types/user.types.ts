@@ -12,7 +12,6 @@ export interface User {
 
 export interface AuthResponseData {
   user: User;
-  token: string;
 }
 
 export interface ApiResponse<T> {

@@ -25,4 +25,18 @@ export const authService = {
     const res = await apiClient.get<ApiResponse<User>>("/users/me");
     return res.data;
   },
+
+  async logout(): Promise<void> {
+    await apiClient.post("/users/logout");
+  },
+
+  async updateProfile(data: {
+    name: string;
+    username: string;
+    bio: string;
+    profile_picture?: string | null;
+  }): Promise<ApiResponse<User>> {
+    const res = await apiClient.patch<ApiResponse<User>>("/users/me", data);
+    return res.data;
+  },
 };

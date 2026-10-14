@@ -89,7 +89,7 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({
   isOpen,
   onClose,
 }) => {
-  const { user, logout, updateUserLocally } = useAuth();
+  const { user, logout, updateProfile } = useAuth();
 
   const [isEditing, setIsEditing] = useState(false);
   const [name, setName] = useState("");
@@ -98,6 +98,9 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({
   const [bio, setBio] = useState("");
   const [selectedAvatar, setSelectedAvatar] = useState<string>("");
   const [saveSuccess, setSaveSuccess] = useState(false);
+  const [usernameError, setUsernameError] = useState<string | null>(null);
+  const [saveError, setSaveError] = useState<string | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
     if (user) {
@@ -113,23 +116,36 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({
 
   const joinDate = formatJoinDate(user.created_at);
 
-  const handleSave = (e: React.FormEvent) => {
+  const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!name.trim() || !username.trim()) return;
 
-    updateUserLocally({
-      name: name.trim(),
-      username: username.trim(),
-      email: email.trim(),
-      bio: bio.trim(),
-      profile_picture: selectedAvatar,
-    });
-
-    setSaveSuccess(true);
-    setTimeout(() => {
-      setSaveSuccess(false);
-      setIsEditing(false);
-    }, 600);
+    setIsSaving(true);
+    setUsernameError(null);
+    setSaveError(null);
+    try {
+      await updateProfile({
+        name: name.trim(),
+        username: username.trim().toLowerCase(),
+        bio: bio.trim(),
+        profile_picture: selectedAvatar,
+      });
+      setSaveSuccess(true);
+      setTimeout(() => {
+        setSaveSuccess(false);
+        setIsEditing(false);
+      }, 600);
+    } catch (err: any) {
+      const message =
+        err.response?.data?.message || err.message || "Failed to update profile";
+      if (message.includes("Username already exists")) {
+        setUsernameError(message);
+      } else {
+        setSaveError(message);
+      }
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const handleCancel = () => {
@@ -140,6 +156,8 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({
       setBio(user.bio || "");
       setSelectedAvatar(user.profile_picture || AVATAR_PRESETS[0].url);
     }
+    setUsernameError(null);
+    setSaveError(null);
     setIsEditing(false);
   };
 
@@ -216,6 +234,9 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({
       ) : (
 
         <form onSubmit={handleSave} className="space-y-4 pt-1 max-h-[75vh] overflow-y-auto px-1">
+          {saveError && (
+            <p role="alert" className="text-xs text-rose-400">{saveError}</p>
+          )}
 
           <div>
             <label className="block text-xs font-semibold text-slate-300 mb-2">
@@ -301,11 +322,21 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({
                 type="text"
                 required
                 value={username}
-                onChange={(e) => setUsername(e.target.value)}
+                onChange={(e) => {
+                  setUsername(e.target.value);
+                  setUsernameError(null);
+                }}
+                aria-invalid={Boolean(usernameError)}
+                aria-describedby={usernameError ? "profile-username-error" : undefined}
                 placeholder="yourusername"
-                className="w-full pl-9 pr-3 py-2 rounded-xl bg-surface-100 border border-card-border text-xs text-white placeholder-slate-400 focus:outline-none focus:border-brand transition-colors"
+                className={`w-full pl-9 pr-3 py-2 rounded-xl bg-surface-100 border text-xs text-white placeholder-slate-400 focus:outline-none focus:border-brand transition-colors ${usernameError ? "border-rose-500" : "border-card-border"}`}
               />
             </div>
+            {usernameError && (
+              <p id="profile-username-error" role="alert" className="mt-1 text-xs text-rose-400">
+                {usernameError}
+              </p>
+            )}
           </div>
 
 
@@ -317,11 +348,11 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({
               <Mail className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
               <input
                 type="email"
-                required
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                readOnly
+                disabled
                 placeholder="you@example.com"
-                className="w-full pl-9 pr-3 py-2 rounded-xl bg-surface-100 border border-card-border text-xs text-white placeholder-slate-400 focus:outline-none focus:border-brand transition-colors"
+                className="w-full pl-9 pr-3 py-2 rounded-xl bg-surface-100 border border-card-border text-xs text-slate-400 placeholder-slate-400 cursor-not-allowed"
               />
             </div>
           </div>
@@ -364,9 +395,12 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({
 
             <button
               type="submit"
-              className="flex-1 flex items-center justify-center gap-1.5 py-2.5 px-4 rounded-xl bg-brand  text-white text-xs font-semibold  transition-all"
+              disabled={isSaving}
+              className="flex-1 flex items-center justify-center gap-1.5 py-2.5 px-4 rounded-xl bg-brand text-white text-xs font-semibold transition-all disabled:opacity-50"
             >
-              {saveSuccess ? (
+              {isSaving ? (
+                <span>Saving...</span>
+              ) : saveSuccess ? (
                 <>
                   <Check className="w-4 h-4" />
                   <span>Saved!</span>

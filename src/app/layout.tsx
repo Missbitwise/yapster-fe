@@ -3,6 +3,7 @@ import "./globals.css";
 import { AuthProvider } from "@/context/AuthContext";
 import { WebSocketProvider } from "@/context/WebSocketContext";
 import { ToastProvider } from "@/context/ToastContext";
+import { LocationProvider } from "@/context/LocationContext";
 
 export const metadata: Metadata = {
   title: "Yapster - Real-Time Chat & Nearby Discovery",
@@ -19,9 +20,11 @@ export default function RootLayout({
     <html lang="en" className="dark">
       <body className="bg-background text-slate-100 antialiased selection:bg-brand selection:text-white">
         <AuthProvider>
-          <WebSocketProvider>
-            <ToastProvider>{children}</ToastProvider>
-          </WebSocketProvider>
+          <LocationProvider>
+            <WebSocketProvider>
+              <ToastProvider>{children}</ToastProvider>
+            </WebSocketProvider>
+          </LocationProvider>
         </AuthProvider>
       </body>
     </html>

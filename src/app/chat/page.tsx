@@ -12,14 +12,12 @@ import { BlockedUsersModal } from "@/components/friends/BlockedUsersModal";
 import { UserProfileModal } from "@/components/layout/UserProfileModal";
 import { ContactProfileModal } from "@/components/friends/ContactProfileModal";
 import { BlockUserModal } from "@/components/friends/BlockUserModal";
-import { LocationPromptModal } from "@/components/location/LocationPromptModal";
 import { useFriends } from "@/hooks/useFriends";
-import { useNearby } from "@/hooks/useNearby";
 import { useWebSocket } from "@/context/WebSocketContext";
 import { useToast } from "@/context/ToastContext";
 import { Friend } from "@/types/friend.types";
 import { useAuth } from "@/context/AuthContext";
-import { MessageSquare, Sparkles, Compass, MapPin } from "lucide-react";
+import { MessageSquare, Compass } from "lucide-react";
 
 export default function ChatDashboardPage() {
   const { user } = useAuth();
@@ -36,12 +34,6 @@ export default function ChatDashboardPage() {
     isBlocked,
   } = useFriends();
 
-  const {
-    currentLocality,
-    hasLocation,
-    updateLocation,
-  } = useNearby(10);
-
   const { subscribe, presenceMap, unreadSendersCount } = useWebSocket();
   const { showToast } = useToast();
 
@@ -51,21 +43,7 @@ export default function ChatDashboardPage() {
   const [contactProfileToView, setContactProfileToView] = useState<Friend | null>(null);
   const [isRequestsModalOpen, setIsRequestsModalOpen] = useState(false);
   const [isBlockedModalOpen, setIsBlockedModalOpen] = useState(false);
-  const [isLocationModalOpen, setIsLocationModalOpen] = useState(false);
   const [userToBlock, setUserToBlock] = useState<{ id: string; name: string } | null>(null);
-
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      const hasPrompted = localStorage.getItem("yapster_location_prompted");
-      if (!hasPrompted && !hasLocation) {
-        const timer = setTimeout(() => {
-          setIsLocationModalOpen(true);
-          localStorage.setItem("yapster_location_prompted", "true");
-        }, 1500);
-        return () => clearTimeout(timer);
-      }
-    }
-  }, [hasLocation]);
 
   useEffect(() => {
     if (friends.length > 0 && !activeContact && typeof window !== "undefined") {
@@ -153,26 +131,6 @@ export default function ChatDashboardPage() {
                 activeContact ? "hidden md:flex" : "flex"
               }`}
             >
-              <div className="px-4 pt-3 pb-1 bg-surface-300">
-                <button
-                  onClick={() => setIsLocationModalOpen(true)}
-                  className="w-full flex items-center justify-between px-3 py-1.5 rounded-full bg-surface-100  border border-card-border  text-[11px] text-slate-300 transition-colors"
-                  title="Click to update your location"
-                >
-                  <div className="flex items-center gap-1.5 truncate">
-                    <MapPin className="w-3.5 h-3.5 text-brand-light shrink-0" />
-                    <span className="truncate">
-                      {currentLocality
-                        ? `Area: ${currentLocality}`
-                        : "Enable Location to Find Nearby"}
-                    </span>
-                  </div>
-                  <span className="text-[10px] text-brand-light font-semibold shrink-0 ml-1">
-                    {hasLocation ? "Active" : "Set GPS"}
-                  </span>
-                </button>
-              </div>
-
               <div className="flex-1 overflow-hidden">
                 <ConversationsList
                   friends={friends}
@@ -231,6 +189,7 @@ export default function ChatDashboardPage() {
             <NearbyRadar
               friends={friends}
               sentRequests={sentRequests}
+              receivedRequests={requests}
               onOpenChat={handleOpenChatWithContact}
               onSendFriendRequest={sendRequest}
               onCancelFriendRequest={cancelRequest}
@@ -252,20 +211,6 @@ export default function ChatDashboardPage() {
             />
           </div>
         )}
-
-
-        <LocationPromptModal
-          isOpen={isLocationModalOpen}
-          onClose={() => setIsLocationModalOpen(false)}
-          onLocationSuccess={async (lat, lng, locality) => {
-            await updateLocation(lat, lng, locality);
-            showToast({
-              title: "Location Updated",
-              description: `GPS coordinates saved (${locality})`,
-              type: "success",
-            });
-          }}
-        />
 
 
         <FriendRequestsModal
