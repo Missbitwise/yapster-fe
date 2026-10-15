@@ -17,7 +17,7 @@ import { useWebSocket } from "@/context/WebSocketContext";
 import { useToast } from "@/context/ToastContext";
 import { Friend } from "@/types/friend.types";
 import { useAuth } from "@/context/AuthContext";
-import { MessageSquare, Compass } from "lucide-react";
+import { MessageSquare } from "lucide-react";
 
 export default function ChatDashboardPage() {
   const { user } = useAuth();
@@ -136,7 +136,6 @@ export default function ChatDashboardPage() {
                   friends={friends}
                   activeContactId={activeContact?.id || null}
                   onSelectContact={(contact) => setActiveContact(contact)}
-                  onOpenNearby={() => setCurrentTab("nearby")}
                   isBlocked={isBlocked}
                 />
               </div>
@@ -166,17 +165,10 @@ export default function ChatDashboardPage() {
                   <h3 className="text-lg font-bold text-white mb-2">
                     Your Yapster Messages
                   </h3>
-                  <p className="text-xs text-slate-400 max-w-sm mb-6">
+                  <p className="text-xs text-slate-400 max-w-sm">
                     Select a conversation from the left to start yapping in real
-                    time, or explore nearby people to make new friends.
+                    time.
                   </p>
-                  <button
-                    onClick={() => setCurrentTab("nearby")}
-                    className="flex items-center gap-2 px-5 py-2.5 rounded-2xl bg-brand  text-white text-xs font-semibold  transition-all"
-                  >
-                    <Compass className="w-4 h-4" />
-                    <span>Find Nearby Friends</span>
-                  </button>
                 </div>
               )}
             </div>

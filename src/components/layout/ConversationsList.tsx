@@ -5,14 +5,13 @@ import { Friend } from "@/types/friend.types";
 import { Avatar } from "@/components/ui/Avatar";
 import { Badge } from "@/components/ui/Badge";
 import { useWebSocket } from "@/context/WebSocketContext";
-import { Search, Sparkles, MessageCircle } from "lucide-react";
+import { Search, MessageCircle } from "lucide-react";
 import { formatLastSeenCompact } from "@/utils/date";
 
 interface ConversationsListProps {
   friends: Friend[];
   activeContactId: string | null;
   onSelectContact: (contact: Friend) => void;
-  onOpenNearby?: () => void;
   isBlocked?: (userId: string) => boolean;
 }
 
@@ -20,7 +19,6 @@ export const ConversationsList: React.FC<ConversationsListProps> = ({
   friends,
   activeContactId,
   onSelectContact,
-  onOpenNearby,
   isBlocked,
 }) => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -63,16 +61,6 @@ export const ConversationsList: React.FC<ConversationsListProps> = ({
           <h1 className="text-xl font-bold tracking-tight text-white">
             Messages
           </h1>
-          {onOpenNearby && (
-            <button
-              onClick={onOpenNearby}
-              className="p-1.5 rounded-xl bg-surface-100 border border-card-border  text-brand-light  transition-all text-xs flex items-center gap-1.5"
-              title="Explore Nearby Friends"
-            >
-              <Sparkles className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline">Nearby</span>
-            </button>
-          )}
         </div>
 
 
@@ -144,7 +132,7 @@ export const ConversationsList: React.FC<ConversationsListProps> = ({
               <p className="text-xs">
                 {searchQuery
                   ? "No contacts matching your search"
-                  : "No friends yet. Discover nearby users or add friends!"}
+                  : "No friends yet. Use Discover Friends Nearby to meet people."}
               </p>
             </div>
           ) : (
